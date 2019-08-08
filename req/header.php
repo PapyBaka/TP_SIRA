@@ -1,4 +1,8 @@
-
+<?php 
+session_start();
+require_once "req/fonctions.php";
+require_once "req/modele.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,9 +32,20 @@
 
   <!-- Navigation -->
   
-
-  <section>
-  <nav class="navbar navbar-dark bg-dark test">
+  <?php if (is_connected()): ?>
+    <nav class="navbar navbar-dark bg-dark test">
+      <div class="container">
+        <a class="navbar-brand" href="#">SIRA</a>
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contactez-nous</a>
+          </li>
+        </ul>
+            <a class="nav-link btn btn-danger" href="deconnexion.php">Se déconnecter</a>
+      </div>
+    </nav>
+<?php else: ?>
+<nav class="navbar navbar-dark bg-dark test">
     <div class="container">
       <a class="navbar-brand" href="#">SIRA</a>
       <ul class="navbar-nav">
@@ -40,18 +55,5 @@
       </ul>
     </div>
   </nav>
-  <div class="overlay-wcs"></div>
-  <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
-    <source src="utilities/videos/Mercedes Cars Road Trip.mp4" type="video/mp4">
-  </video>
-  <div class="container h-100">
-    <div class="d-flex h-100 text-center align-items-center">
-      <div class="w-100 text-white">
-        <h1>Bienvenue à bord</h1>
-        <h2 class="text-white-50 mx-auto mt-2 mb-5">Location de véhicule 24h/24 & 7j/7</h2>
-        <button type="button" class="btn btn-success" href="#" data-toggles="modal" data-targer="inscription-popup">Inscription</button>
-        <button type="button" class="btn btn-success" href="#">Connexion</button>
-      </div>
-    </div>
-  </div>
-</section>
+<?php endif ?>
+<!-- MODAL -->
