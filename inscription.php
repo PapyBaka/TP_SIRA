@@ -7,7 +7,7 @@ if (isset($_POST["inscription"])) {
     if (isset($_POST["pseudo"]) && isset($_POST["nom"]) && isset($_POST["prenom"]) && isset($_POST["mail"]) && isset($_POST["mdp"]) && !empty($_POST["civilite"])) {
 
         $pseudo = trim(htmlspecialchars($_POST["pseudo"]));
-        if (strlen($pseudo) < 5 && strlen($pseudo) > 15) {
+        if (strlen($pseudo) < 5 || strlen($pseudo) > 15) {
             $error["pseudo"] = "Votre pseudo doit comprendre entre 5 et 15 caractères";
         } else {
             $parametres[] = $pseudo;
@@ -45,20 +45,24 @@ if (isset($_POST["inscription"])) {
             if (count($parametres) != 6) {
                 throw new Exception("Tous les champs doivent être completés");
             }
-            $requete = "SELECT pseudo FROM membres WHERE pseudo = ?";
-            $execute = execRequete($requete,[$pseudo]);
-            if ($execute->rowCount() != 0) {
+            $requete_pseudo = "SELECT pseudo FROM membres WHERE pseudo = ?";
+            $execute_pseudo = execRequete($requete_pseudo,[$pseudo]);
+            if ($execute_pseudo->rowCount() != 0) {
                 $error["pseudo"] = "Pseudo déjà existant";
             }
-            $requete = "SELECT email FROM membres WHERE email = ?";
-            $execute = execRequete($requete,[$mail]);
-            if ($execute->rowCount() != 0) {
+            $requete_mail = "SELECT email FROM membres WHERE email = ?";
+            $execute_mail = execRequete($requete_mail,[$mail]);
+            if ($execute_mail->rowCount() != 0) {
                 $error["mail"] = "Mail déjà existant";
             }
-            $requete = "INSERT INTO membres (pseudo,nom,prenom,email,mot_de_passe,civilite) VALUES (?,?,?,?,?,?)";
-            execRequete($requete,$parametres); 
-            $success = "Inscription réussie. Vous serez redirigé vers la page de connexion dans 5 secondes. Si ce n'est pas le cas, <a href='connexion.php'>cliquez ici";
-            header("refresh:5;url=index.php"); 
+
+            if($execute_pseudo->rowCount() == 0 && $execute_mail->rowCount() == 0){
+                $requete = "INSERT INTO membres (pseudo,nom,prenom,email,mot_de_passe,civilite) VALUES (?,?,?,?,?,?)";
+                execRequete($requete,$parametres); 
+                $success = "Inscription réussie. Vous serez redirigé vers la page de connexion dans 5 secondes. Si ce n'est pas le cas, <a href='connexion.php'>cliquez ici";
+                header("refresh:5;url=index.php"); 
+            }
+            
         } catch (Exception $e) {
             $error["global"] = $e->getMessage();
         }  
@@ -70,77 +74,107 @@ if (isset($_POST["inscription"])) {
 ?>
 
 <div class="container">
-    <div class="card mt-4 text-center">
+    <div class="card mt-4">
 
-        <div class="card-header">
-            <h1>Inscription</h1>
+        <div class="card-header bg-dark text-center text-light">
+            <h1 class="display-4">Inscription</h1>
         </div>
         <?php if (isset($error["global"])): ?>
-        <div class="card-header alert alert-danger">
+        <div class="card-header alert alert-danger text-center font-weight-bold">
             <?= $error["global"] ?>
         </div>
         <?php endif ?>
         <?php if (isset($success)): ?>
-        <div class="card-header alert alert-success">
+        <div class="card-header alert alert-success font-weight-bold">
             <?= $success ?>
         </div>
         <?php endif ?>
         <div class="card-body">
         <form method="post" action="">
-            <div class="form-row">
-                <div class="form-group col-6">
-                    <label for="nom">Nom</label>
-                    <input type="text" value="<?= !empty($error) ? $_POST["nom"] : "" ?>" class="form-control <?= isset($error["nom"]) ? "is-invalid" : "" ?>" name="nom" id="nom" >
+            <div class="form-group row">
+                    <label for="nom" class="col-md-4 col-form-label text-md-right font-weight-bold">Nom :</label>
+                    <div class="col-md-5">
+                        <input type="text" value="<?= !empty($error) ? $_POST["nom"] : "" ?>" class="form-control <?= isset($error["nom"]) ? "is-invalid" : "" ?>" name="nom" id="nom" >
+                    
                     <?php if (isset($error["nom"])): ?>
                         <div class="invalid-feedback">
                             <?= $error["nom"]; ?>
                         </div>
                     <?php endif ?>
-                </div>
-                <div class="form-group col-6">
-                    <label for="prenom">Prénom</label>
-                    <input type="text" value="<?= !empty($error) ? $_POST["prenom"] : "" ?>" class="form-control <?= isset($error["prenom"]) ? "is-invalid" : "" ?>" name="prenom" id="prenom">
+                    </div>
+            </div>
+
+            <div class="form-group row">
+                    <label for="prenom" class="col-md-4 col-form-label text-md-right font-weight-bold">Prénom :</label>
+                    <div class="col-md-5">
+                        <input type="text" value="<?= !empty($error) ? $_POST["prenom"] : "" ?>" class="form-control <?= isset($error["prenom"]) ? "is-invalid" : "" ?>" name="prenom" id="prenom">
+                        <?php if (isset($error["prenom"])): ?>
+                            <div class="invalid-feedback">
+                                <?= $error["prenom"]; ?>
+                            </div>
+                        <?php endif ?>
+                    </div>
+            </div>
+            
+            <div class="form-group row">
+                <label for="pseudo" class="col-md-4 col-form-label text-md-right font-weight-bold">Pseudo :</label>
+                <div class="col-md-5">
+                    <input type="text" value="<?= !empty($error) ? $_POST["pseudo"] : "" ?>" class="form-control <?= isset($error["pseudo"]) ? "is-invalid" : "" ?>" name="pseudo" id="pseudo" maxlength="15">
+                    <?php if (isset($error["pseudo"])): ?>
+                            <div class="invalid-feedback">
+                                <?= $error["pseudo"]; ?>
+                            </div>
+                        <?php endif ?>
                 </div>
             </div>
+
             <div class="form-group row">
-                <label for="pseudo">Pseudo</label>
-                <input type="text" value="<?= !empty($error) ? $_POST["pseudo"] : "" ?>" class="form-control <?= isset($error["pseudo"]) ? "is-invalid" : "" ?>" name="pseudo" id="pseudo">
-                <?php if (isset($error["pseudo"])): ?>
-                        <div class="invalid-feedback">
-                            <?= $error["pseudo"]; ?>
-                        </div>
-                    <?php endif ?>
-            </div>
-            <div class="form-group row">
-                <label for="mail">Mail</label>
+                <label for="mail" class="col-md-4 col-form-label text-md-right font-weight-bold">Mail :</label>
+                <div class="col-md-5">
                 <input type="email" value="<?= !empty($error) ? $_POST["mail"] : "" ?>" class="form-control <?= isset($error["mail"]) ? "is-invalid" : "" ?>" name="mail" id="mail">
-                <?php if (isset($error["mail"])): ?>
-                        <div class="invalid-feedback">
-                            <?= $error["mail"]; ?>
-                        </div>
-                    <?php endif ?>
+                    <?php if (isset($error["mail"])): ?>
+                            <div class="invalid-feedback">
+                                <?= $error["mail"]; ?>
+                            </div>
+                        <?php endif ?>
+                </div>
             </div>
+
             <div class="form-group row">
-                <label for="mdp">Mot de passe</label>
-                <input type="password" class="form-control <?= isset($error["mdp"]) ? "is-invalid" : "" ?>" name="mdp" id="mdp">
-                <?php if (isset($error["mdp"])): ?>
-                        <div class="invalid-feedback">
-                            <?= $error["mdp"]; ?>
-                        </div>
-                    <?php endif ?>
+                <label for="mdp" class="col-md-4 col-form-label text-md-right font-weight-bold">Mot de passe :</label>
+                <div class="col-md-5">
+                    <input type="password" class="form-control <?= isset($error["mdp"]) ? "is-invalid" : "" ?>" name="mdp" id="mdp" maxlength="15">
+                    <?php if (isset($error["mdp"])): ?>
+                            <div class="invalid-feedback">
+                                <?= $error["mdp"]; ?>
+                            </div>
+                        <?php endif ?>
+                </div>
             </div>
+
             <div class="form-group row">
-                <label for="civilite"></label>
-                <select class="form-control" name="civilite" id="civilite">
-                    <option selected disabled>Choix du sexe</option>
-                    <option <?= isset($error) ? "selected" : "" ?>>Homme</option>
-                    <option>Femme</option>
-                </select>
+                <label for="civilite" class="col-md-4 col-form-label text-md-right font-weight-bold"></label>
+                <div class="col-md-5">
+                    <select class="form-control" name="civilite" id="civilite">
+                        <option selected>--- Choix du sexe ---</option>
+                        <option >Homme</option>
+                        <option >Femme</option>
+                    </select>
+                </div>
             </div>
-            <button class="btn btn-success" type="submit" name="inscription">S'inscrire</button>
+
+                <div class="row justify-content-center">
+                        <button type="submit" class="btn btn-info btn-lg" name="inscription">
+                            S'inscrire
+                        </button> 
+                </div>       
         </form>
+
         </div>
+        <div class="card-footer bg-dark "></div>
+
     </div>
 
 </div>
+
 <?php require "req/footer.php" ?>

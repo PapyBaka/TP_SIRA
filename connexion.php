@@ -35,28 +35,38 @@ if (isset($_POST["connexion"])) {
 
 <div class="container">
     <div class="card mt-4">
-        <div class="card-header">
-            <h1>Connexion</h1>
+        <div class="card-header bg-dark text-center text-white">
+            <h1 class="display-4">Connexion</h1>
         </div>
         <?php if (isset($error)): ?>
-        <div class="card-header alert alert-danger">
+        <div class="card-header alert text-center alert-danger font-weight-bold">
             <?= $error ?>
         </div>
         <?php endif ?>
         <div class="card-body">
             <form method="post" action="">
-                <div class="form-group">
-                    <label for="identifiant">Pseudo/email</label>
-                    <input class="form-control" type="text" id="identifiant" name="identifiant">
+                <div class="form-group row">
+                    <label for="identifiant" class="col-md-5 col-form-label text-md-right font-weight-bold">Pseudo ou Email : </label>
+                    <div class="col-md-4">
+                        <input class="form-control" type="text" id="identifiant" name="identifiant">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="mdp">Mot de passe</label>
-                    <input class="form-control" type="password" id="mdp" name="mdp">
+                <div class="form-group row">
+                    <label for="mdp" class="col-md-5 col-form-label text-md-right font-weight-bold">Mot de passe :</label>
+                    <div class="col-md-4">
+                        <input class="form-control" type="password" id="mdp" name="mdp">
+                    </div>
                 </div>
-                <button class="btn btn-primary" type="submit" name="connexion">Se connecter</button>
-            </form>
+                    <div class="row justify-content-center">
+                        <button type="submit" class="btn btn-outline-success btn-lg" name="connexion">
+                                Se connecter
+                        </button> 
+                    </div>            
+                </form>
         </div>
     </div>
+    <div class="card-footer bg-dark "></div>
+
 </div>
 <?php
 require "req/footer.php";
