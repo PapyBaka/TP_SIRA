@@ -49,8 +49,8 @@
       <div class="w-100 text-white">
         <h1>Bienvenue à bord</h1>
         <h2 class="text-white-50 mx-auto mt-2 mb-5">Location de véhicule 24h/24 & 7j/7</h2>
+        <button type="button" class="btn btn-success" href="#" data-toggles="modal" data-targer="inscription-popup">Inscription</button>
         <button type="button" class="btn btn-success" href="#">Connexion</button>
-        <button type="button" class="btn btn-success" href="#">Inscription</button>
       </div>
     </div>
   </div>
