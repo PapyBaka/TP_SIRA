@@ -1,4 +1,5 @@
 <?php
+require "req/modele.php";
 require "req/header.php";
 if (is_connected()) {
     header("Location:index.php");

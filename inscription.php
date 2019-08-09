@@ -1,4 +1,5 @@
 <?php 
+require "req/modele.php";
 require "req/header.php";
 $error = [];
 $success = null;
@@ -85,7 +86,7 @@ if (isset($_POST["inscription"])) {
         </div>
         <?php endif ?>
         <?php if (isset($success)): ?>
-        <div class="card-header alert alert-success font-weight-bold">
+        <div class="card-header alert alert-success text-center font-weight-bold">
             <?= $success ?>
         </div>
         <?php endif ?>
@@ -156,7 +157,7 @@ if (isset($_POST["inscription"])) {
                 <label for="civilite" class="col-md-4 col-form-label text-md-right font-weight-bold"></label>
                 <div class="col-md-5">
                     <select class="form-control" name="civilite" id="civilite">
-                        <option selected>--- Choix du sexe ---</option>
+                        <option selected disabled>--- Choix du sexe ---</option>
                         <option >Homme</option>
                         <option >Femme</option>
                     </select>

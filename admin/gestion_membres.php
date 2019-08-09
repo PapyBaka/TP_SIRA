@@ -56,14 +56,14 @@ echo "</pre>";
     <div class="form-group">
         <select class="form-control">
             <label for="pseudo">Civilité</label>
-            <option>--- Civilité ---</option>
+            <option selected disabled>--- Civilité ---</option>
             <option>Homme </option>
             <option>Femme </option>        
         </select>
     </div>
     <div class="form-group">
         <select class="form-control">
-            <option>--- Statuts ---</option>
+            <option selected disabled>--- Statut ---</option>
             <option>Admin </option>
             <option>Membre </option>        
         </select>

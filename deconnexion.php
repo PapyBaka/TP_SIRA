@@ -1,3 +1,3 @@
 <?php
-require "req/header.php";
+require "req/modele.php";
 deconnexion();
