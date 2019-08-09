@@ -59,7 +59,7 @@ if (isset($_POST["inscription"])) {
             if($execute_pseudo->rowCount() == 0 && $execute_mail->rowCount() == 0){
                 $requete = "INSERT INTO membres (pseudo,nom,prenom,email,mot_de_passe,civilite) VALUES (?,?,?,?,?,?)";
                 execRequete($requete,$parametres); 
-                $success = "Inscription réussie. Vous serez redirigé vers la page de connexion dans 5 secondes. Si ce n'est pas le cas, <a href='connexion.php'>cliquez ici";
+                $success = "Inscription réussie. Vous serez redirigé vers la page de connexion dans 5 secondes. Si ce n'est pas le cas, <a href='connexion.php'>cliquez ici</a>";
                 header("refresh:5;url=index.php"); 
             }
             

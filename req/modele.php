@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once "fonctions.php";
 
 function connect() {
     $pdo = new PDO
@@ -12,7 +14,7 @@ function connect() {
     return $pdo;
 }
 
-function execRequete($req, $param){
+function execRequete($req, $param = null){
 	$query = connect()->prepare($req);
 	$query->execute($param);
 	return $query;

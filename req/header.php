@@ -1,8 +1,4 @@
-<?php 
-session_start();
-require_once "req/fonctions.php";
-require_once "req/modele.php";
-?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,13 +29,32 @@ require_once "req/modele.php";
   <!-- Navigation -->
   
   <?php if (is_connected()): ?>
-    <nav class="navbar navbar-dark bg-dark test">
+    <nav class="navbar navbar-expand navbar-dark bg-dark test">
       <div class="container">
-        <a class="navbar-brand" href="#">SIRA</a>
+        <a class="navbar-brand" href="<?= RACINE ?>">SIRA</a>
         <ul class="navbar-nav mr-auto">
+          
+          <?php if ($_SESSION["statut"] == "admin"): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= RACINE . 'admin/gestion_membres.php'?>">Gestion membres</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= RACINE . 'admin/gestion_commandes.php'?>">Gestion commandes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= RACINE . 'admin/gestion_vehicules.php'?>">Gestion véhicules</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= RACINE . 'admin/gestion_agences.php'?>">Gestion agences</a>
+          </li>
+          <?php else: ?>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Mon compte</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Contactez-nous</a>
           </li>
+          <?php endif ?>
         </ul>
             <a class="nav-link btn btn-danger" href="deconnexion.php">Se déconnecter</a>
       </div>
@@ -47,7 +62,7 @@ require_once "req/modele.php";
 <?php else: ?>
 <nav class="navbar navbar-dark bg-dark test">
     <div class="container">
-      <a class="navbar-brand" href="#">SIRA</a>
+      <a class="navbar-brand" href="index.php">SIRA</a>
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" href="#">Contactez-nous</a>

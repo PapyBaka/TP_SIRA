@@ -18,6 +18,7 @@ if (isset($_POST["connexion"])) {
             }
             $donnees = $exec->fetch();
             $_SESSION["id"] = $donnees->id;
+            $_SESSION["statut"] = $donnees->statut;
             $_SESSION["pseudo"] = $donnees->pseudo;
             $_SESSION["prenom"] = $donnees->prenom;
             $_SESSION["nom"] = $donnees->nom;

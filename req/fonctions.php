@@ -13,3 +13,9 @@ function deconnexion() {
         header("Location:index.php");
     }
 }
+
+function afficher_actions($infos) {
+    echo "chercher";
+    echo "modifier";
+    echo "supprimer";
+}
