@@ -42,7 +42,7 @@
         <a class="navbar-brand" href="<?= RACINE ?>">SIRA</a>
         <ul class="navbar-nav mr-auto">
           
-          <?php if ($_SESSION["statut"] == "admin"): ?>
+          <?php if ($_SESSION["statut"] == "Admin"): ?>
           <li class="nav-item">
             <a class="nav-link" href="<?= RACINE . 'admin/gestion_membres.php'?>">Gestion membres</a>
           </li>

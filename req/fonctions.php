@@ -15,43 +15,53 @@ function deconnexion() {
 }
 
 function afficher_actions($infos) {
+    $lien = $_SERVER['SCRIPT_NAME'];
 return <<<HTML
-    <a href='gestion_membres.php?id=$infos->id'><i class="material-icons">search</i></a>
-    <a href='gestion_membres.php?id=$infos->id&action=modify'><i class="material-icons">edit</i></a>
-    <a href='gestion_membres.php?id=$infos->id&action=delete'><i class="material-icons">delete</i></a>
+    <a href="$lien?id=$infos->id"><i class="material-icons">search</i></a>
+    <a href='$lien?id=$infos->id&action=modify'><i class="material-icons">edit</i></a>
+    <a href='$lien?id=$infos->id&action=delete'><i class="material-icons">delete</i></a>
 HTML;
 }
 
-function verif_inscription($infos) {
+function verif_inscription($infos,$file = null) {
     /* VERIF FORMAT ET INSERTION DANS TABLEAU PARAMETRES */
     $error = null;
-    $pseudo = trim(htmlspecialchars($infos["pseudo"]));
-    
-    if (strlen($pseudo) < 5 || strlen($pseudo) > 15) {
-        $error["pseudo"] = "Votre pseudo doit comprendre entre 5 et 15 caractères";
-    } else {
-        $parametres[] = $pseudo;
+
+    /* VERIF MEMBRE */
+    if (isset($infos["pseudo"])) {
+        $pseudo = trim(htmlspecialchars($infos["pseudo"]));
+        if (strlen($pseudo) < 5 || strlen($pseudo) > 15) {
+            $error["pseudo"] = "Votre pseudo doit comprendre entre 5 et 15 caractères";
+        } else {
+            $parametres[] = $pseudo;
+        }
     }
     
-    $nom = trim(htmlspecialchars($infos["nom"]));
-    if (preg_match("/([^A-Za-z])/",$nom)) {
-        $error["nom"] = "Votre nom ne peut contenir que des lettres de l'alphabet";
-    } else {
-        $parametres[] = $nom;
+    if (isset($infos["nom"])) {
+        $nom = trim(htmlspecialchars($infos["nom"]));
+        if (preg_match("/([^A-Za-z])/",$nom)) {
+            $error["nom"] = "Votre nom ne peut contenir que des lettres de l'alphabet";
+        } else {
+            $parametres[] = $nom;
+        }
     }
 
-    $prenom = trim(htmlspecialchars($infos["prenom"]));
-    if (preg_match("/([^A-Za-z])/",$prenom)) {
-        $error["prenom"] = "Votre prénom ne peut contenir que des lettres de l'alphabet";
-    } else {
-        $parametres[] = $prenom;
+    if (isset($infos["prenom"])) {
+        $prenom = trim(htmlspecialchars($infos["prenom"]));
+        if (preg_match("/([^A-Za-z])/",$prenom)) {
+            $error["prenom"] = "Votre prénom ne peut contenir que des lettres de l'alphabet";
+        } else {
+            $parametres[] = $prenom;
+        }
     }
 
-    $mail = trim(htmlspecialchars($infos["mail"]));
-    if (!filter_var($mail,FILTER_VALIDATE_EMAIL)) {
-        $error["mail"] = "Votre mail doit être dans un format valide";
-    } else {
-        $parametres[] = $mail;
+    if (isset($infos["mail"])) {
+        $mail = trim(htmlspecialchars($infos["mail"]));
+        if (!filter_var($mail,FILTER_VALIDATE_EMAIL)) {
+            $error["mail"] = "Votre mail doit être dans un format valide";
+        } else {
+            $parametres[] = $mail;
+        }
     }
 
     if (isset($infos["mdp"])) {
@@ -61,17 +71,91 @@ function verif_inscription($infos) {
         } else {
             $parametres[] = hash("sha512",$mdp);
         }
-    }  
-    $parametres[] = $infos["civilite"];
+    } 
+
+    if (isset($infos["civilite"])) {
+        $parametres[] = $infos["civilite"];
+    }
+
+    if (isset($infos["statut"])) {
     $parametres[] = $infos["statut"];
+    }
 
     if(!empty($infos['id'])){
         $parametres[] = $infos['id'];
     }
 
+    /* VERIF AGENCE */
+    if (isset($file['fichier'])) {
+        if ($file['fichier']['error'] != 0) {
+            $error["fichier"] = "Erreur lors de l'accès au fichier";
+        }
+        if ($file['fichier']['size'] >= 1000000) {
+            $error["fichier"] = "Taille du fichier trop importante";
+        }
+        //extensiosn autorisées
+        $extension_autorisees = ["jpg", "jpeg", "png", "gif"];
+        //nom et extension
+        $info = pathinfo($file['fichier']['name']);
+        //extension de notre fichier
+        $extension_uploadee = $info['extension'];
+        var_dump($info);
+        //on va vérifier l'exentsion
+        if (!in_array($extension_uploadee, $extension_autorisees)) {
+            $error["fichier"] = "Extension non autorisée";
+        }
+        $nom = $file['fichier']['name'];
+        move_uploaded_file($file['fichier']['tmp_name'], RACINE . 'img/' . $nom);
+        $parametres[] = RACINE . 'utilities/img/' . $nom;
+    }
+
+    if (isset($infos["titre"])) {
+        $titre = trim(htmlspecialchars($infos["titre"]));
+        if (strlen($titre) < 5 || strlen($titre) > 30) {
+            $error["titre"] = "Votre titre doit comprendre entre 5 et 30 caractères";
+        } else {
+            $parametres[] = $titre;
+        }
+    }
+
+    if (isset($infos["adresse"])) {
+        $adresse = trim(htmlspecialchars($infos["adresse"]));
+        if (strlen($adresse) < 5) {
+            $error["adresse"] = "Votre adresse doit comprendre au moins 5 caractères";
+        } else {
+            $parametres[] = $adresse;
+        }
+    }
+
+    if (isset($infos["cp"])) {
+        $cp = trim(htmlspecialchars($infos["cp"]));
+        if (strlen($cp) != 5) {
+            $error["cp"] = "Votre cp doit comprendre 5 caractères";
+        } else {
+            $parametres[] = $cp;
+        }
+    }
+
+    if (isset($infos["ville"])) {
+        $ville = $infos["ville"];
+        $parametres[] = $ville;
+    }
+
+    if (isset($infos["description"])) {
+        $description = trim(htmlspecialchars($infos["description"]));
+        if (strlen($description) < 10) {
+            $error["description"] = "Votre description doit comprendre au moins 10 caractères";
+        } else {
+            $parametres[] = $description;
+        }
+    }
+
     /* VERIF TABLEAU PARAMETRES ET DISPONIBILITE PSEUDO/MAIL */
     try {
-        if (count($parametres) != count($infos)) {
+        if (!isset($file) && count($parametres) != count($infos)) {
+            throw new Exception("Des champs ne sont pas valides");
+        }
+        if (isset($file) && count($parametres) != count($infos) + 1) {
             throw new Exception("Des champs ne sont pas valides");
         }
         $requete_pseudo = "SELECT pseudo FROM membres WHERE pseudo = ?";
