@@ -44,7 +44,7 @@ if (isset($_POST["inscription"])) {
         $parametres[] = $civilite = $_POST["civilite"];
          try {
             if (count($parametres) != 6) {
-                throw new Exception("Tous les champs doivent être completés");
+                throw new Exception("Des champs ne sont pas valides");
             }
             $requete_pseudo = "SELECT pseudo FROM membres WHERE pseudo = ?";
             $execute_pseudo = execRequete($requete_pseudo,[$pseudo]);
