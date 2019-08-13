@@ -23,7 +23,7 @@ return <<<HTML
 HTML;
 }
 
-function verif_inscription($infos,$file = null) {
+function verif_inscription($infos) {
     /* VERIF FORMAT ET INSERTION DANS TABLEAU PARAMETRES */
     $error = null;
 
@@ -64,7 +64,7 @@ function verif_inscription($infos,$file = null) {
         }
     }
 
-    if (isset($infos["mdp"])) {
+    if (!empty($infos["mdp"])) {
         $mdp = trim(htmlspecialchars($infos["mdp"]));
         if (strlen($mdp) < 8 || strlen($mdp) > 15) {
             $error["mdp"] = "Votre mot de passe doit comprendre entre 8 et 15 caractères";
@@ -85,7 +85,32 @@ function verif_inscription($infos,$file = null) {
         $parametres[] = $infos['id'];
     }
 
-    /* VERIF AGENCE */
+    /* VERIF TABLEAU PARAMETRES ET DISPONIBILITE PSEUDO/MAIL */
+    try {
+        if (!empty($error)) {
+            throw new Exception("Des champs ne sont pas valides");
+        }
+         if (($execute_pseudo = execRequete("SELECT pseudo FROM membres WHERE pseudo = ? AND id NOT IN (?)",[$pseudo,$infos['id']])) == false) {
+             throw new Exception("Erreur lors de la verification du pseudo");
+         }
+        
+        if ($execute_pseudo->rowCount() != 0) {
+            $error["pseudo"] = "Pseudo déjà existant";
+        }
+        if (($execute_mail = execRequete("SELECT email FROM membres WHERE email = ? AND id NOT IN (?)",[$mail,$infos['id']])) == false) {
+            throw new Exception ("Erreur lors de de la verification du mail");
+        }
+        if ($execute_mail->rowCount() != 0) {
+            $error["mail"] = "Mail déjà existant";
+        }
+    } catch (Exception $e) {
+        $error["global"] = $e->getMessage();
+    }
+
+    return ["error" => $error,"parametres" => $parametres];
+}
+
+function verif_agence($infos,$file) {
     if (isset($file['fichier'])) {
         if ($file['fichier']['error'] != 0) {
             $error["fichier"] = "Erreur lors de l'accès au fichier";
@@ -149,29 +174,4 @@ function verif_inscription($infos,$file = null) {
             $parametres[] = $description;
         }
     }
-
-    /* VERIF TABLEAU PARAMETRES ET DISPONIBILITE PSEUDO/MAIL */
-    try {
-        if (!isset($file) && count($parametres) != count($infos)) {
-            throw new Exception("Des champs ne sont pas valides");
-        }
-        if (isset($file) && count($parametres) != count($infos) + 1) {
-            throw new Exception("Des champs ne sont pas valides");
-        }
-        $requete_pseudo = "SELECT pseudo FROM membres WHERE pseudo = ?";
-        $execute_pseudo = execRequete($requete_pseudo,[$pseudo]);
-        if ($execute_pseudo->rowCount() != 0) {
-            $error["pseudo"] = "Pseudo déjà existant";
-        }
-        $requete_mail = "SELECT email FROM membres WHERE email = ?";
-        $execute_mail = execRequete($requete_mail,[$mail]);
-        if ($execute_mail->rowCount() != 0) {
-            $error["mail"] = "Mail déjà existant";
-        }
-    } catch (Exception $e) {
-        $error["global"] = $e->getMessage();
-    }
-    
-
-    return ["error" => $error,"parametres" => $parametres];
 }
