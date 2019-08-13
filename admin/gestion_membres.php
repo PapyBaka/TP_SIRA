@@ -11,13 +11,16 @@ $error = null;
 $success = isset($_GET["success"]) ? "Membre supprimé avec succès" : null;
 
 echo "<pre>";
-var_dump($_GET);
+var_dump($_POST);
 echo "</pre>";
 
 try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);
         unset($_GET);
+        echo "<pre>";
+var_dump($_POST);
+echo "</pre>";
         if (empty($_POST["prenom"]) || empty($_POST["nom"]) || empty($_POST["mail"]) || empty($_POST["pseudo"]) || empty($_POST["statut"]) || empty($_POST["civilite"])) {
             throw new Exception("Tous les champs doivent être remplis");
         }
@@ -33,7 +36,10 @@ try {
         /* MODIFICATION */  
         } else {
             $verif_inscription = verif_inscription($_POST);
-            
+            echo "<pre>";
+            var_dump($verif_inscription["parametres"]);
+            var_dump($verif_inscription["error"]);
+            echo "</pre>";
             if (empty($verif_inscription["error"])) {
                 if (!empty($_POST["mdp"])) {
                     $requete = execRequete("UPDATE membres SET pseudo = ?,nom = ?,prenom = ?,email = ?,mot_de_passe = ?,civilite= ?,statut= ? WHERE id = ?",$verif_inscription["parametres"]);
@@ -62,36 +68,38 @@ try {
         }
         
     }
+/* RECUPERATION DES INFOS DE LA TABLE MEMBRES */
     $donnees = execRequete("SELECT id,pseudo,nom,prenom,email,civilite,statut, DATE_FORMAT(date_enregistrement, '%d/%m/%Y - %Hh%i') AS date_enregistrement FROM membres");
     $membres = $donnees->fetchAll();
+    $donnees = execRequete("SELECT DISTINCT(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'membres' AND COLUMN_NAME NOT IN ('mot_de_passe')");
+    $colonnes = $donnees->fetchAll();
 } catch (Exception $e) {
     $error = $e->getMessage();
 }
-echo "<pre>";
-echo "</pre>";
 ?>
 <div class="container">
-        
-    <table class="table text-center table-bordered">
-        <thead class="thead-dark">
-            <tr>
-            <?php foreach ($membres[0] as $k => $info): ?>
-                <th><?= $k ?></th>
+    <div class='table-responsive'>  
+         <table class="table text-center table-striped">
+            <thead class="black white-text">
+                <tr class="font-weight-bold">
+                <?php foreach ($colonnes as $colonne): ?>
+                    <th><?= $colonne->COLUMN_NAME ?></th>
+                    <?php endforeach ?>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($membres as $membre): ?>
+                <tr>
+                    <?php foreach ($membre as $info): ?>
+                    <td class="font-weight-bold"><?= $info ?></td>
+                    <?php endforeach ?>
+                    <td><?= afficher_actions($membre) ?></td>
+                </tr>
                 <?php endforeach ?>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($membres as $membre): ?>
-            <tr>
-                <?php foreach ($membre as $info): ?>
-                <td><?= $info ?></td>
-                <?php endforeach ?>
-                <td><?= afficher_actions($membre) ?></td>
-            </tr>
-            <?php endforeach ?>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 
     <?php if (isset($error) || isset($verif_inscription["error"]["global"])): ?>
         <div class="alert alert-danger">
@@ -106,7 +114,7 @@ echo "</pre>";
     <?php endif ?>
 
     <form method="post" action="">
-        <input type="hidden" value="<?= isset($info_membre) ? $_GET["id"] : '' ?>" <?= isset($info_membre) ? 'name="id"' : '' ?>>
+        <input type="hidden" value="<?= isset($info_membre) ? $_GET["id"] : '' ?>" name="id">
         <div class="form-group">
             <label for="pseudo">Pseudo</label>
             <input type="text" class="form-control <?= isset($verif_inscription["error"]["pseudo"]) ? "is-invalid" : "" ?>" id="pseudo" name="pseudo" value="<?= isset($info_membre) ? $info_membre->pseudo : "" ?><?= isset($verif_inscription["error"]) ? $_POST["pseudo"] : "" ?>">
@@ -117,7 +125,7 @@ echo "</pre>";
             <?php endif ?>
         </div>
         <div class="form-group">
-            <label for="nom">Mot de passe</label>
+            <label for="mdp">Mot de passe</label>
             <input type="password" class="form-control <?= isset($verif_inscription["error"]["mdp"]) ? "is-invalid" : "" ?>" id="mdp" name="mdp" placeholder="<?= isset($info_membre) ? "Facultatif" : "" ?>">
             <?php if (isset($verif_inscription["error"]["mdp"])): ?>
                 <div class="invalid-feedback">

@@ -53,7 +53,7 @@ try {
     if (isset($_GET["action"]) && isset($_GET["id"])) {
         if ($_GET["action"] == "modify") {
             $donnees = execRequete("SELECT titre,adresse,ville,cp,description FROM agences WHERE id = ?",[$_GET["id"]]);
-            $info_membre = $donnees->fetch();
+            $info_agence = $donnees->fetch();
         } else if ($_GET["action"] == "delete") {
             $requete = execRequete("DELETE FROM agences WHERE id = ? LIMIT 1",[$_GET["id"]]);
             $success = "Agence supprimée avec succès";
@@ -61,8 +61,11 @@ try {
         }
         
     }
+    /* RECUPERATION DES INFOS DE LA TABLE MEMBRES */
     $donnees = execRequete("SELECT id,titre,adresse,ville,cp,description,photos FROM agences");
     $agences = $donnees->fetchAll();
+    $donnees = execRequete("SELECT DISTINCT(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'agences'");
+    $colonnes = $donnees->fetchAll();
 } catch (Exception $e) {
     $error = $e->getMessage();
 }
@@ -76,8 +79,8 @@ echo "</pre>";
     <table class="table text-center table-bordered ">
         <thead class="thead-dark">
             <tr>
-            <?php foreach ($agences[0] as $k => $info): ?>
-                <th><?= $k ?></th>
+            <?php foreach ($colonnes as $colonne): ?>
+                <th><?= $colonne->COLUMN_NAME ?></th>
                 <?php endforeach ?>
                 <th>Action</th>
             </tr>
@@ -111,10 +114,10 @@ echo "</pre>";
     <?php endif ?>
 
     <form method="post" action="" enctype="multipart/form-data">
-        <input type="hidden" value="<?= isset($info_membre) ? $_GET["id"] : '' ?>" <?= isset($info_membre) ? 'name="id"' : '' ?>>
+        <input type="hidden" value="<?= isset($info_agence) ? $_GET["id"] : '' ?>" <?= isset($info_agence) ? 'name="id"' : '' ?>>
         <div class="form-group">
             <label for="titre">Titre :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["titre"]) ? "is-invalid" : "" ?>" id="titre" name="titre" value="<?= isset($info_membre) ? $info_membre->titre : "" ?><?= isset($verif_inscription["error"]) ? $_POST["titre"] : "" ?>">
+            <input type="text" class="form-control <?= isset($verif_inscription["error"]["titre"]) ? "is-invalid" : "" ?>" id="titre" name="titre" value="<?= isset($info_agence) ? $info_agence->titre : "" ?><?= isset($verif_inscription["error"]) ? $_POST["titre"] : "" ?>">
             <?php if (isset($verif_inscription["error"]["titre"])): ?>
                 <div class="invalid-feedback">
                     <?= $verif_inscription["error"]["titre"]; ?>
@@ -123,7 +126,7 @@ echo "</pre>";
         </div>
         <div class="form-group">
             <label for="adresse">Adresse :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["adresse"]) ? "is-invalid" : "" ?>" id="adresse" name="adresse" placeholder="<?= isset($info_membre) ? "Facultatif" : "" ?>">
+            <input type="text" class="form-control <?= isset($verif_inscription["error"]["adresse"]) ? "is-invalid" : "" ?>" id="adresse" name="adresse" value="<?= isset($info_agence) ? $info_agence->titre : "" ?>">
             <?php if (isset($verif_inscription["error"]["adresse"])): ?>
                 <div class="invalid-feedback">
                     <?= $verif_inscription["error"]["adresse"]; ?>
@@ -132,7 +135,7 @@ echo "</pre>";
         </div>
         <div class="form-group">
             <label for="ville">Ville :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["ville"]) ? "is-invalid" : "" ?>" id="ville" name="ville" value="<?= isset($info_membre) ? $info_membre->ville : "" ?><?= isset($verif_inscription["error"]) ? $_POST["ville"] : "" ?>">
+            <input type="text" class="form-control <?= isset($verif_inscription["error"]["ville"]) ? "is-invalid" : "" ?>" id="ville" name="ville" value="<?= isset($info_agence) ? $info_agence->ville : "" ?><?= isset($verif_inscription["error"]) ? $_POST["ville"] : "" ?>">
             <?php if (isset($verif_inscription["error"]["ville"])): ?>
                 <div class="invalid-feedback">
                     <?= $verif_inscription["error"]["ville"]; ?>
@@ -141,7 +144,7 @@ echo "</pre>";
         </div>
         <div class="form-group">
             <label for="cp">CP :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["cp"]) ? "is-invalid" : "" ?>" id="cp" name="cp" value="<?= isset($info_membre) ? $info_membre->cp : "" ?><?= isset($verif_inscription["error"]) ? $_POST["cp"] : "" ?>">
+            <input type="text" class="form-control <?= isset($verif_inscription["error"]["cp"]) ? "is-invalid" : "" ?>" id="cp" name="cp" value="<?= isset($info_agence) ? $info_agence->cp : "" ?><?= isset($verif_inscription["error"]) ? $_POST["cp"] : "" ?>">
             <?php if (isset($verif_inscription["error"]["cp"])): ?>
                 <div class="invalid-feedback">
                     <?= $verif_inscription["error"]["cp"]; ?>
@@ -150,7 +153,7 @@ echo "</pre>";
         </div>
         <div class="form-group">
             <label for="description">Description :</label>
-            <textarea type="text" class="form-control <?= isset($verif_inscription["error"]["description"]) ? "is-invalid" : "" ?>" id="description" name="description" value="<?= isset($info_membre) ? $info_membre->edescription : "" ?><?= isset($verif_inscription["error"]) ? $_POST["description"] : "" ?>"></textarea>
+            <textarea type="text" class="form-control <?= isset($verif_inscription["error"]["description"]) ? "is-invalid" : "" ?>" id="description" name="description" value="<?= isset($info_agence) ? $info_agence->description : "" ?><?= isset($verif_inscription["error"]) ? $_POST["description"] : "" ?>"></textarea>
             <?php if (isset($verif_inscription["error"]["description"])): ?>
                 <div class="invalid-feedback">
                     <?= $verif_inscription["error"]["description"]; ?>

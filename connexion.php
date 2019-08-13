@@ -36,40 +36,57 @@ if (isset($_POST["connexion"])) {
 ?>
 
 <div class="container">
-    <div class="card mt-4">
-        <div class="card-header bg-dark text-center text-white">
-            <h1 class="display-4">Connexion</h1>
-        </div>
-        <?php if (isset($error)): ?>
-        <div class="card-header alert text-center alert-danger font-weight-bold">
-            <?= $error ?>
-        </div>
-        <?php endif ?>
-        <div class="card-body">
-            <form method="post" action="">
-                <div class="form-group row">
-                    <label for="identifiant" class="col-md-5 col-form-label text-md-right font-weight-bold">Pseudo ou Email : </label>
-                    <div class="col-md-4">
-                        <input class="form-control" type="text" id="identifiant" name="identifiant">
-                    </div>
+
+<div class="card mt-4">
+
+            <h4 class="card-header bg-dark white-text text-center py-4">
+            <strong>Connexion</strong></h4>
+
+            <?php if (isset($error)): ?>
+                <p class="text-danger text-center font-weight-bold mt-4">
+                    <?= $error ?>
+                </p>
+            <?php endif ?>
+
+            <!--Card content-->
+            <div class="card-body px-lg-5 pt-0">
+
+            <!-- Form -->
+            <form method="POST" class="text-center" style="color: #757575;" action="#!">
+
+                <!-- Email -->
+                <div class="md-form">
+                <input type="text" id="materialLoginFormEmail" class="form-control" name="identifiant">
+                <label for="materialLoginFormEmail" >E-mail ou pseudo</label>
                 </div>
-                <div class="form-group row">
-                    <label for="mdp" class="col-md-5 col-form-label text-md-right font-weight-bold">Mot de passe :</label>
-                    <div class="col-md-4">
-                        <input class="form-control" type="password" id="mdp" name="mdp">
-                    </div>
+
+                <!-- Password -->
+                <div class="md-form">
+                <input type="password" id="materialLoginFormPassword" class="form-control" name="mdp">
+                <label for="materialLoginFormPassword">Mot de passe</label>
                 </div>
-                    <div class="row justify-content-center">
-                        <button type="submit" class="btn btn-outline-success btn-lg" name="connexion">
-                                Se connecter
-                        </button> 
-                    </div>            
-                </form>
+
+              
+
+                <!-- Sign in button -->
+                <button class="btn btn-default btn-block my-4 waves-effect z-depth-0" type="submit" name="connexion">Se connecter</button>
+
+                <!-- Register -->
+                <p>Pas encore membre ?
+                <a href="<?= RACINE."inscription.php"?>">S'inscrire</a>
+                </p>
+
+            </form>
+            <!-- Form -->
+
+            </div>
+
+            </div>
         </div>
-    </div>
-    <div class="card-footer bg-dark "></div>
+    
 
 </div>
+
 <?php
 require "req/footer.php";
 ?>
