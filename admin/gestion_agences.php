@@ -7,43 +7,48 @@ if ($_SESSION["statut"] !== "Admin"){
 }
  
 $error = null;
-$success = isset($_GET["success"]) ? "Agence supprimée avec succès" : null;
-
-echo "<pre>";
-var_dump($_POST);
-var_dump($_FILES);
-echo "</pre>";
-
+/* $success = isset($_GET["success"]) ? "Agence supprimée avec succès" : null; */
+$success = null;
 try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);
-        unset($_GET);
+        unset($_GET["success"]);
         if (empty($_POST["titre"]) || empty($_POST["adresse"]) || empty($_POST["ville"]) || empty($_POST["cp"]) || empty($_POST["description"]) || empty($_FILES["fichier"])) {
             throw new Exception("Tous les champs doivent être remplis");
         }
         /* INSERTION */
         if (empty($_POST["id"])) {
-            
-            $verif_inscription = verif_inscription($_POST,$_FILES);
-            if (empty($verif_inscription["error"])) {
-                
-                $requete = execRequete("INSERT INTO agences (titre,adresse,ville,cp,description,photos) VALUES (?,?,?,?,?,?)",$verif_inscription["parametres"]);
+            echo "PAS D'ID";
+            $verif_agence = verif_agence($_POST,$_FILES);
+            if (empty($verif_agence["error"])) {
+                $requete = execRequete("INSERT INTO agences (titre,adresse,ville,cp,description,photos) VALUES (?,?,?,?,?,?)",$verif_agence["parametres"]);
                 $success = "Agence ajoutée avec succès";
             }
         /* MODIFICATION */  
-        } else {
-            $verif_inscription = verif_inscription($_POST,$_FILES);
-            if (empty($verif_inscription["error"])) {
-                if (!empty($_POST["file"])) {
-                    $requete = execRequete("UPDATE agences SET titre = ?,adresse = ?,ville = ?,cp = ?,description = ?,photos = ? WHERE id = ?",$verif_inscription["parametres"]);
+            } else {
+                echo "ID SET";
+                echo "<pre>";
+                var_dump($_FILES);
+                echo "</pre>";
+                
+                if (!empty($_FILES["fichier"]["name"])) {
+                    // FICHIER CHOISI
+                    $verif_agence = verif_agence($_POST,$_FILES);
+                    if (empty($verif_agence["error"])) {
+                        $requete = execRequete("UPDATE agences SET titre = ?,adresse = ?,ville = ?,cp = ?,description = ?,photos = ? WHERE id = ?",$verif_agence["parametres"]);
+                        $success = "Agence modifiée avec succès";
+                    }
                 } else {
-                    $requete = execRequete("UPDATE agences SET titre = ?,adresse = ?,ville = ?,cp = ?,description= ? WHERE id = ?",$verif_inscription["parametres"]);
+                    // FICHIER PAS CHOISI
+                    $verif_agence = verif_agence($_POST);
+                    if (empty($verif_agence["error"])) {
+                    $requete = execRequete("UPDATE agences SET titre = ?,adresse = ?,ville = ?,cp = ?,description= ? WHERE id = ?",$verif_agence["parametres"]);
+                    $success = "Agence modifiée avec succès";
+                    }
                 }
-                $success = "Agence modifiée avec succès";
+                
             }
-        }
-    }
-        
+        }       
 } catch (Exception $e) {
     $error = $e->getMessage();
 }
@@ -52,16 +57,17 @@ try {
 try {
     if (isset($_GET["action"]) && isset($_GET["id"])) {
         if ($_GET["action"] == "modify") {
-            $donnees = execRequete("SELECT titre,adresse,ville,cp,description FROM agences WHERE id = ?",[$_GET["id"]]);
+            $donnees = execRequete("SELECT titre,adresse,ville,cp,description,photos FROM agences WHERE id = ?",[$_GET["id"]]);
             $info_agence = $donnees->fetch();
         } else if ($_GET["action"] == "delete") {
-            $requete = execRequete("DELETE FROM agences WHERE id = ? LIMIT 1",[$_GET["id"]]);
-            $success = "Agence supprimée avec succès";
+            $requete = execRequete("DELETE FROM agences WHERE id = ?",[$_GET["id"]]);
+/*             $requete = execRequete("DELETE agences,vehicules FROM agences INNER JOIN vehicules ON agences.id = vehicules.agence_id WHERE agences.id = ?",[$_GET["id"]]);
+ */            $success = "Agence supprimée avec succès";
             header("Location:gestion_agences.php?success");
         }
         
     }
-    /* RECUPERATION DES INFOS DE LA TABLE MEMBRES */
+    /* RECUPERATION DES INFOS DE LA TABLE AGENCES */
     $donnees = execRequete("SELECT id,titre,adresse,ville,cp,description,photos FROM agences");
     $agences = $donnees->fetchAll();
     $donnees = execRequete("SELECT DISTINCT(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'agences'");
@@ -69,9 +75,8 @@ try {
 } catch (Exception $e) {
     $error = $e->getMessage();
 }
-echo "<pre>";
-var_dump($agences);
-echo "</pre>";
+
+
 ?>
   
 <div class="container">
@@ -101,62 +106,78 @@ echo "</pre>";
         </tbody>
     </table>
 
-    <?php if (isset($error) || isset($verif_inscription["error"]["global"])): ?>
+    <?php if (isset($error) || isset($verif_agence["error"]["fichier"]) || isset($verif_agence["error"]["global"])): ?>
         <div class="alert alert-danger">
-            <?= isset ($error) ? $error : ""?>
-            <?= isset ($verif_inscription["error"]["global"]) ? $verif_inscription["error"]["global"] : ""?>
+            <?= isset ($error) ? $error . "<br>" : ""?>
+            <?= isset ($verif_agence["error"]["fichier"]) ? $verif_agence["error"]["fichier"] . "<br>" : ""?>
+            <?= isset ($verif_agence["error"]["global"]) ? $verif_agence["error"]["global"] . "<br>" : ""?>
         </div>
     <?php endif ?>
-    <?php if (isset($success)): ?>
+
+    <?php if (!empty($success)): ?>
         <div class="alert alert-success">
+            <?= $success ?>
+        </div>
+    <?php endif ?>
+    <?php if (isset($_GET["success"])): ?>
+        <div class="alert alert-success">
+            <?php $success = "Agence supprimée avec succès"; ?>
             <?= $success ?>
         </div>
     <?php endif ?>
 
     <form method="post" action="" enctype="multipart/form-data">
-        <input type="hidden" value="<?= isset($info_agence) ? $_GET["id"] : '' ?>" <?= isset($info_agence) ? 'name="id"' : '' ?>>
+
+    <?php if (!empty($_POST["id"]) || !empty($_GET["id"])): ?>
+        <?php if (isset($info_agence)): ?>
+        <input type="text" value="<?= $_GET["id"] ?>" name="id">
+        <?php elseif (isset($verif_agence["error"])): ?>
+        <input type="text" value="<?= $_POST["id"] ?>" name="id">
+        <?php endif ?>
+    <?php endif ?>
+
         <div class="form-group">
             <label for="titre">Titre :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["titre"]) ? "is-invalid" : "" ?>" id="titre" name="titre" value="<?= isset($info_agence) ? $info_agence->titre : "" ?><?= isset($verif_inscription["error"]) ? $_POST["titre"] : "" ?>">
-            <?php if (isset($verif_inscription["error"]["titre"])): ?>
+            <input type="text" class="form-control <?= isset($verif_agence["error"]["titre"]) ? "is-invalid" : "" ?>" id="titre" name="titre" value="<?= isset($info_agence) ? $info_agence->titre : "" ?><?= isset($verif_agence["error"]) ? $_POST["titre"] : "" ?>">
+            <?php if (isset($verif_agence["error"]["titre"])): ?>
                 <div class="invalid-feedback">
-                    <?= $verif_inscription["error"]["titre"]; ?>
+                    <?= $verif_agence["error"]["titre"]; ?>
                 </div>
             <?php endif ?>
         </div>
         <div class="form-group">
             <label for="adresse">Adresse :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["adresse"]) ? "is-invalid" : "" ?>" id="adresse" name="adresse" value="<?= isset($info_agence) ? $info_agence->titre : "" ?>">
-            <?php if (isset($verif_inscription["error"]["adresse"])): ?>
+            <input type="text" class="form-control <?= isset($verif_agence["error"]["adresse"]) ? "is-invalid" : "" ?>" id="adresse" name="adresse" value="<?= isset($info_agence) ? $info_agence->adresse : "" ?><?= isset($verif_agence["error"]) ? $_POST["adresse"] : "" ?>">
+            <?php if (isset($verif_agence["error"]["adresse"])): ?>
                 <div class="invalid-feedback">
-                    <?= $verif_inscription["error"]["adresse"]; ?>
+                    <?= $verif_agence["error"]["adresse"]; ?>
                 </div>
             <?php endif ?>
         </div>
         <div class="form-group">
             <label for="ville">Ville :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["ville"]) ? "is-invalid" : "" ?>" id="ville" name="ville" value="<?= isset($info_agence) ? $info_agence->ville : "" ?><?= isset($verif_inscription["error"]) ? $_POST["ville"] : "" ?>">
-            <?php if (isset($verif_inscription["error"]["ville"])): ?>
+            <input type="text" class="form-control <?= isset($verif_agence["error"]["ville"]) ? "is-invalid" : "" ?>" id="ville" name="ville" value="<?= isset($info_agence) ? $info_agence->ville : "" ?><?= isset($verif_agence["error"]) ? $_POST["ville"] : "" ?>">
+            <?php if (isset($verif_agence["error"]["ville"])): ?>
                 <div class="invalid-feedback">
-                    <?= $verif_inscription["error"]["ville"]; ?>
+                    <?= $verif_agence["error"]["ville"]; ?>
                 </div>
             <?php endif ?>
         </div>
         <div class="form-group">
             <label for="cp">CP :</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["cp"]) ? "is-invalid" : "" ?>" id="cp" name="cp" value="<?= isset($info_agence) ? $info_agence->cp : "" ?><?= isset($verif_inscription["error"]) ? $_POST["cp"] : "" ?>">
-            <?php if (isset($verif_inscription["error"]["cp"])): ?>
+            <input type="number" class="form-control <?= isset($verif_agence["error"]["cp"]) ? "is-invalid" : "" ?>" id="cp" name="cp" value="<?= isset($info_agence) ? $info_agence->cp : "" ?><?= isset($verif_agence["error"]) ? $_POST["cp"] : "" ?>">
+            <?php if (isset($verif_agence["error"]["cp"])): ?>
                 <div class="invalid-feedback">
-                    <?= $verif_inscription["error"]["cp"]; ?>
+                    <?= $verif_agence["error"]["cp"]; ?>
                 </div>
             <?php endif ?>
         </div>
         <div class="form-group">
             <label for="description">Description :</label>
-            <textarea type="text" class="form-control <?= isset($verif_inscription["error"]["description"]) ? "is-invalid" : "" ?>" id="description" name="description" value="<?= isset($info_agence) ? $info_agence->description : "" ?><?= isset($verif_inscription["error"]) ? $_POST["description"] : "" ?>"></textarea>
-            <?php if (isset($verif_inscription["error"]["description"])): ?>
+            <textarea type="text" class="form-control <?= isset($verif_agence["error"]["description"]) ? "is-invalid" : "" ?>" id="description" name="description"><?= isset($info_agence) ? $info_agence->description : "" ?><?= isset($verif_agence["error"]) ? $_POST["description"] : "" ?></textarea>
+            <?php if (isset($verif_agence["error"]["description"])): ?>
                 <div class="invalid-feedback">
-                    <?= $verif_inscription["error"]["description"]; ?>
+                    <?= $verif_agence["error"]["description"]; ?>
                 </div>
             <?php endif ?>
         </div>

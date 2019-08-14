@@ -8,19 +8,13 @@ if ($_SESSION["statut"] !== "Admin"){
 }    
 
 $error = null;
-$success = isset($_GET["success"]) ? "Membre supprimé avec succès" : null;
+$success = null;
 
-echo "<pre>";
-var_dump($_POST);
-echo "</pre>";
 
 try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);
         unset($_GET);
-        echo "<pre>";
-var_dump($_POST);
-echo "</pre>";
         if (empty($_POST["prenom"]) || empty($_POST["nom"]) || empty($_POST["mail"]) || empty($_POST["pseudo"]) || empty($_POST["statut"]) || empty($_POST["civilite"])) {
             throw new Exception("Tous les champs doivent être remplis");
         }
@@ -79,9 +73,9 @@ try {
 ?>
 <div class="container">
     <div class='table-responsive'>  
-         <table class="table text-center table-striped">
-            <thead class="black white-text">
-                <tr class="font-weight-bold">
+         <table class="table text-center">
+            <thead class="bg-dark white-text">
+                <tr>
                 <?php foreach ($colonnes as $colonne): ?>
                     <th><?= $colonne->COLUMN_NAME ?></th>
                     <?php endforeach ?>
@@ -92,7 +86,7 @@ try {
                 <?php foreach ($membres as $membre): ?>
                 <tr>
                     <?php foreach ($membre as $info): ?>
-                    <td class="font-weight-bold"><?= $info ?></td>
+                    <td class="font-weight"><?= $info ?></td>
                     <?php endforeach ?>
                     <td><?= afficher_actions($membre) ?></td>
                 </tr>
@@ -107,8 +101,14 @@ try {
             <?= isset ($verif_inscription["error"]["global"]) ? $verif_inscription["error"]["global"] : ""?>
         </div>
     <?php endif ?>
-    <?php if (isset($success)): ?>
+    <?php if (!empty($success)): ?>
         <div class="alert alert-success">
+            <?= $success ?>
+        </div>
+    <?php endif ?>
+    <?php if (isset($_GET["success"])): ?>
+        <div class="alert alert-success">
+            <?php $success = "Membre supprimé avec succès"; ?>
             <?= $success ?>
         </div>
     <?php endif ?>

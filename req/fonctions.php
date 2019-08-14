@@ -23,6 +23,16 @@ return <<<HTML
 HTML;
 }
 
+function value_input($infos,$name,$error) {
+    if(isset($infos)) {
+        echo $infos->$name;
+    } elseif (isset($error)) {
+        echo $_POST["$name"];
+    } else {
+        echo "";
+    }
+}
+
 function verif_inscription($infos) {
     /* VERIF FORMAT ET INSERTION DANS TABLEAU PARAMETRES */
     $error = null;
@@ -110,30 +120,12 @@ function verif_inscription($infos) {
     return ["error" => $error,"parametres" => $parametres];
 }
 
-function verif_agence($infos,$file) {
-    if (isset($file['fichier'])) {
-        if ($file['fichier']['error'] != 0) {
-            $error["fichier"] = "Erreur lors de l'accès au fichier";
-        }
-        if ($file['fichier']['size'] >= 1000000) {
-            $error["fichier"] = "Taille du fichier trop importante";
-        }
-        //extensiosn autorisées
-        $extension_autorisees = ["jpg", "jpeg", "png", "gif"];
-        //nom et extension
-        $info = pathinfo($file['fichier']['name']);
-        //extension de notre fichier
-        $extension_uploadee = $info['extension'];
-        var_dump($info);
-        //on va vérifier l'exentsion
-        if (!in_array($extension_uploadee, $extension_autorisees)) {
-            $error["fichier"] = "Extension non autorisée";
-        }
-        $nom = $file['fichier']['name'];
-        move_uploaded_file($file['fichier']['tmp_name'], RACINE . 'img/' . $nom);
-        $parametres[] = RACINE . 'utilities/img/' . $nom;
-    }
 
+
+function verif_agence($infos,$file = null) {
+    $error = null;
+
+    /* VERIF FORMAT CHAMPS */
     if (isset($infos["titre"])) {
         $titre = trim(htmlspecialchars($infos["titre"]));
         if (strlen($titre) < 5 || strlen($titre) > 30) {
@@ -152,6 +144,11 @@ function verif_agence($infos,$file) {
         }
     }
 
+    if (isset($infos["ville"])) {
+        $ville = $infos["ville"];
+        $parametres[] = $ville;
+    }
+
     if (isset($infos["cp"])) {
         $cp = trim(htmlspecialchars($infos["cp"]));
         if (strlen($cp) != 5) {
@@ -159,11 +156,6 @@ function verif_agence($infos,$file) {
         } else {
             $parametres[] = $cp;
         }
-    }
-
-    if (isset($infos["ville"])) {
-        $ville = $infos["ville"];
-        $parametres[] = $ville;
     }
 
     if (isset($infos["description"])) {
@@ -174,4 +166,168 @@ function verif_agence($infos,$file) {
             $parametres[] = $description;
         }
     }
+    
+    if (!empty($file['fichier'])) {
+        try {
+            // Verifie qu'il n'y a pas d'erreur
+            if ($file['fichier']['error'] != 0) {
+                throw new Exception("Erreur lors de l'accès au fichier");
+            }
+
+            // Verifie la taille du fichier
+            if ($file['fichier']['size'] >= 1000000) {
+                throw new Exception("Taille du fichier trop importante");
+            }
+            //extensions autorisées
+            $extension_autorisees = ["jpg", "jpeg", "png", "gif"];
+            //nom et extension
+            $info = pathinfo($file['fichier']['name']);
+            //extension de notre fichier
+            $extension_uploadee = $info['extension'];
+            //on va vérifier l'extension
+            if (!in_array($extension_uploadee, $extension_autorisees)) {
+                throw new Exception("Extension non autorisée");
+            }
+            $nom = $file['fichier']['name'];
+            move_uploaded_file($file['fichier']['tmp_name'], '../utilities/img/agences/' . $nom);
+            $parametres[] = RACINE . 'utilities/img/agences/' . $nom;
+
+        } catch (Exception $e) {
+            $error["fichier"] = $e->getMessage();
+        }
+    }
+
+    if (isset($infos["id"])) {
+        $id = $infos["id"];
+        $parametres[] = $id;
+    }
+
+    /* VERIF ERREURS ET DOUBLONS */
+    try {
+        if (!empty($error)) {
+            throw new Exception("Des champs ne sont pas valides");
+        }
+        if (!isset($id)) {
+            if (($execute_titre = execRequete("SELECT titre FROM agences WHERE titre = ?",[$titre])) == false) {
+                throw new Exception("Erreur lors de la verification du titre");
+            }
+        } else {
+            if (($execute_titre = execRequete("SELECT titre FROM agences WHERE titre = ? AND id NOT IN (?)",[$titre,$infos['id']])) == false) {
+                throw new Exception("Erreur lors de la verification du titre");
+            }
+        }
+        
+        if ($execute_titre->rowCount() != 0) {
+            $error["titre"] = "Titre déjà existant";
+        }
+
+        if (!isset($id)) {
+            if (($execute_adresse = execRequete("SELECT adresse FROM agences WHERE adresse = ?",[$adresse])) == false) {
+                throw new Exception ("Erreur lors de de la verification de l'adresse");
+            }
+        } else {
+            if (($execute_adresse = execRequete("SELECT adresse FROM agences WHERE adresse = ? AND id NOT IN (?)",[$adresse,$infos['id']])) == false) {
+                throw new Exception ("Erreur lors de de la verification de l'adresse");
+            }
+        }
+        
+        if ($execute_adresse->rowCount() != 0) {
+            $error["adresse"] = "Adresse déjà existante";
+        }
+    } catch (Exception $e) {
+        $error["global"] = $e->getMessage();
+    }
+
+    return ["error" => $error, "parametres" => $parametres];
+}
+
+/* VERIF VEHICULE */
+function verif_vehicule($infos,$file = null) {
+    $error = null;
+
+    /* VERIF FORMAT CHAMPS */
+    if (isset($infos["titre"])) {
+        $titre = trim(htmlspecialchars($infos["titre"]));
+        if (strlen($titre) < 5 || strlen($titre) > 30) {
+            $error["titre"] = "Votre titre doit comprendre entre 5 et 30 caractères";
+        } else {
+            $parametres[] = $titre;
+        }
+    }
+
+    if (isset($infos["marque"])) {
+        $marque = trim(htmlspecialchars($infos["marque"]));
+            $parametres[] = $marque;
+    }
+
+    if (isset($infos["modele"])) {
+        $modele = $infos["modele"];
+        $parametres[] = $modele;
+    }
+
+    if (isset($infos["description"])) {
+        $description = trim(htmlspecialchars($infos["description"]));
+        if (strlen($description) < 10) {
+            $error["description"] = "Votre description doit comprendre au moins 10 caractères";
+        } else {
+            $parametres[] = $description;
+        }
+    }
+
+    if (isset($infos["prix"])) {
+        $prix = $infos["prix"];
+        $parametres[] = $prix;
+    }
+
+    if (isset($infos["agence_id"])) {
+        $agence_id = $infos["agence_id"];
+        $parametres[] = $agence_id;
+    }
+
+    
+    if (!empty($file['fichier'])) {
+        try {
+            // Verifie qu'il n'y a pas d'erreur
+            if ($file['fichier']['error'] != 0) {
+                throw new Exception("Erreur lors de l'accès au fichier");
+            }
+
+            // Verifie la taille du fichier
+            if ($file['fichier']['size'] >= 1000000) {
+                throw new Exception("Taille du fichier trop importante");
+            }
+            //extensions autorisées
+            $extension_autorisees = ["jpg", "jpeg", "png", "gif"];
+            //nom et extension
+            $info = pathinfo($file['fichier']['name']);
+            //extension de notre fichier
+            $extension_uploadee = $info['extension'];
+            //on va vérifier l'extension
+            if (!in_array($extension_uploadee, $extension_autorisees)) {
+                throw new Exception("Extension non autorisée");
+            }
+            $nom = $file['fichier']['name'];
+            move_uploaded_file($file['fichier']['tmp_name'], '../utilities/img/vehicules/' . $nom);
+            $parametres[] = RACINE . 'utilities/img/vehicules/' . $nom;
+
+        } catch (Exception $e) {
+            $error["fichier"] = $e->getMessage();
+        }
+    }
+
+    if (isset($infos["id"])) {
+        $id = $infos["id"];
+        $parametres[] = $id;
+    }
+
+    /* VERIF ERREURS ET DOUBLONS */
+    try {
+        if (!empty($error)) {
+            throw new Exception("Des champs ne sont pas valides");
+        }
+    } catch (Exception $e) {
+        $error["global"] = $e->getMessage();
+    }
+
+    return ["error" => $error, "parametres" => $parametres];
 }

@@ -35,7 +35,7 @@
 <body id="page-top">
 
   <!-- Navigation -->
-  <nav class="navbar navbar-expand navbar-dark bg-dark test">
+  <nav class="navbar navbar-expand navbar-dark default-color mb-4">
       <div class="container">
       <a class="navbar-brand" href="<?= RACINE ?>">SIRA</a>
         <ul class="navbar-nav ml-auto">
