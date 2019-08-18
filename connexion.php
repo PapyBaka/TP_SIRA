@@ -39,7 +39,7 @@ if (isset($_POST["connexion"])) {
 
 <div class="card mt-4">
 
-            <h4 class="card-header bg-dark white-text text-center py-4">
+            <h4 class="card-header blue-grey darken-1 white-text text-center py-4">
             <strong>Connexion</strong></h4>
 
             <?php if (isset($error)): ?>
@@ -52,18 +52,18 @@ if (isset($_POST["connexion"])) {
             <div class="card-body px-lg-5 pt-0 mt-2">
 
             <!-- Form -->
-            <form method="POST" class="text-center" style="color: #757575;" action="#!">
+            <form method="POST" class="text-center" style="color: #757575;" action="">
 
-                <!-- Email -->
+                <!-- Pseudo / email -->
                 <div class="md-form">
-                <input type="text" id="materialLoginFormEmail" class="form-control" name="identifiant">
-                <label for="materialLoginFormEmail" >E-mail ou pseudo</label>
+                    <input type="text" id="materialLoginFormEmail" class="form-control" name="identifiant">
+                    <label for="materialLoginFormEmail">E-mail ou pseudo</label>
                 </div>
 
                 <!-- Password -->
                 <div class="md-form">
-                <input type="password" id="materialLoginFormPassword" class="form-control" name="mdp">
-                <label for="materialLoginFormPassword">Mot de passe</label>
+                    <input type="password" id="materialLoginFormPassword" class="form-control" name="mdp">
+                    <label for="materialLoginFormPassword">Mot de passe</label>
                 </div>
 
               

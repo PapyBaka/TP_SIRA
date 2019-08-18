@@ -98,7 +98,7 @@ function verif_inscription($infos) {
     /* VERIF TABLEAU PARAMETRES ET DISPONIBILITE PSEUDO/MAIL */
     try {
         if (!empty($error)) {
-            throw new Exception("Des champs ne sont pas valides");
+            throw new Exception("Certains champs ne sont pas valides");
         }
          if (($execute_pseudo = execRequete("SELECT pseudo FROM membres WHERE pseudo = ? AND id NOT IN (?)",[$pseudo,$infos['id']])) == false) {
              throw new Exception("Erreur lors de la verification du pseudo");

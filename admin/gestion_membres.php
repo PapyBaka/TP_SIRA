@@ -14,7 +14,7 @@ $success = null;
 try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);
-        unset($_GET);
+        unset($_GET['success']);
         if (empty($_POST["prenom"]) || empty($_POST["nom"]) || empty($_POST["mail"]) || empty($_POST["pseudo"]) || empty($_POST["statut"]) || empty($_POST["civilite"])) {
             throw new Exception("Tous les champs doivent être remplis");
         }
@@ -30,10 +30,6 @@ try {
         /* MODIFICATION */  
         } else {
             $verif_inscription = verif_inscription($_POST);
-            echo "<pre>";
-            var_dump($verif_inscription["parametres"]);
-            var_dump($verif_inscription["error"]);
-            echo "</pre>";
             if (empty($verif_inscription["error"])) {
                 if (!empty($_POST["mdp"])) {
                     $requete = execRequete("UPDATE membres SET pseudo = ?,nom = ?,prenom = ?,email = ?,mot_de_passe = ?,civilite= ?,statut= ? WHERE id = ?",$verif_inscription["parametres"]);
@@ -96,28 +92,28 @@ try {
     </div>
 
     <?php if (isset($error) || isset($verif_inscription["error"]["global"])): ?>
-        <div class="alert alert-danger">
+        <p class="text-danger text-center font-weight-bold mt-4 h6">
             <?= isset ($error) ? $error : ""?>
             <?= isset ($verif_inscription["error"]["global"]) ? $verif_inscription["error"]["global"] : ""?>
-        </div>
+        </p>
     <?php endif ?>
     <?php if (!empty($success)): ?>
-        <div class="alert alert-success">
+        <p class="text-success text-center font-weight-bold mt-4 h6">
             <?= $success ?>
-        </div>
+        </p>
     <?php endif ?>
     <?php if (isset($_GET["success"])): ?>
-        <div class="alert alert-success">
+        <p class="text-success text-center font-weight-bold mt-4 h6">
             <?php $success = "Membre supprimé avec succès"; ?>
             <?= $success ?>
-        </div>
+        </p>
     <?php endif ?>
 
     <form method="post" action="">
         <input type="hidden" value="<?= isset($info_membre) ? $_GET["id"] : '' ?>" name="id">
         <div class="form-group">
             <label for="pseudo">Pseudo</label>
-            <input type="text" class="form-control <?= isset($verif_inscription["error"]["pseudo"]) ? "is-invalid" : "" ?>" id="pseudo" name="pseudo" value="<?= isset($info_membre) ? $info_membre->pseudo : "" ?><?= isset($verif_inscription["error"]) ? $_POST["pseudo"] : "" ?>">
+            <input type="text" class="form-control <?= isset($verif_inscription["error"]["pseudo"]) ? "is-invalid" : "" ?>" id="pseudo" name="pseudo" value="<?= isset($info_membre) ? $info_membre->pseudo : "" ?>">
             <?php if (isset($verif_inscription["error"]["pseudo"])): ?>
                 <div class="invalid-feedback">
                     <?= $verif_inscription["error"]["pseudo"]; ?>
