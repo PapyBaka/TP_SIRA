@@ -34,7 +34,7 @@
 <body id="">
 
   <!-- Navigation -->
-  <nav class="navbar navbar-expand-md default-color navbar-dark mb-4">
+  <nav class="navbar navbar-expand-md sticky-top default-color navbar-dark mb-4">
     <div class="container">
       <a class="navbar-brand" href="<?= RACINE ?>">SIRA</a>
 
@@ -73,7 +73,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-user"></i>
+                <i class="fas fa-user"></i> Bonjour <?= $_SESSION['prenom']?>
             </a>
               <div class="dropdown-menu dropdown-menu-right dropdown-default">
                 <a class="dropdown-item" href="#">Mon compte</a>              
