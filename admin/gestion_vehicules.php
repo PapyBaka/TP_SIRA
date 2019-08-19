@@ -15,9 +15,7 @@ try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);
         unset($_GET["success"]);
-        if (empty($_POST["titre"]) || empty($_POST["marque"]) || empty($_POST["modele"]) || empty($_POST["description"]) || empty($_POST["prix"]) || empty($_POST["agence_id"]) || empty($_FILES["fichier"])) {
-            throw new Exception("Tous les champs doivent être remplis");
-        }
+        
         /* INSERTION */
         if (empty($_POST["id"])) {
             $verif_vehicule = verif_vehicule($_POST,$_FILES);
@@ -89,14 +87,14 @@ try {
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody class="">
+        <tbody class="mr-4">
             <?php foreach ($vehicules as $vehicule): ?>
-            <tr>
+            <tr >
                 <?php foreach ($vehicule as $k => $info): ?>
                 <?php if ($k == "photos"): ?>
                 <td class="align-middle"><img class="img-fluid p-0" width="150" height="150" src="<?= $info ?>"></td>
                 <?php else: ?>
-                <td class="align-middle"><?= $info ?></td>
+                <td class="align-middle "><?= $info ?></td>
                 <?php endif ?>
                 <?php endforeach ?>
                 <td class="align-middle"><?= afficher_actions($vehicule) ?></td>
@@ -105,6 +103,7 @@ try {
         </tbody>
     </table>
 
+    <!-- AFFICHAGE DES ERREURS ET DES SUCCESS -->
     <?php if (isset($error) || isset($verif_vehicule["error"]["fichier"]) || isset($verif_vehicule["error"]["global"])): ?>
         <div class="alert alert-danger">
             <?= isset ($error) ? $error . "<br>" : ""?>

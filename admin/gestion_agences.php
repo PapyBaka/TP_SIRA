@@ -7,8 +7,8 @@ if ($_SESSION["statut"] !== "Admin"){
 }
  
 $error = null;
-/* $success = isset($_GET["success"]) ? "Agence supprimée avec succès" : null; */
 $success = null;
+
 try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);

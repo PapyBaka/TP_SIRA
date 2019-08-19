@@ -19,7 +19,27 @@ function afficher_actions($infos) {
 return <<<HTML
     <a href="$lien?id=$infos->id"><i class="material-icons">search</i></a>
     <a href='$lien?id=$infos->id&action=modify'><i class="material-icons">edit</i></a>
-    <a href='$lien?id=$infos->id&action=delete'><i class="material-icons">delete</i></a>
+    <a data-toggle="modal" data-target="#suppression$infos->id"><i class="material-icons">delete</i></a>
+    <!-- Modal -->
+    <div class="modal fade" id="suppression$infos->id" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close mr-0" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            
+        </div>
+        <div class="modal-body">
+        <h5 class="modal-title m-auto">Attention !</h5>
+            Supprimer une agence effacera tous les véhicules associés
+        </div>
+        <div class="modal-footer justify-content-center">
+            <a href='$lien?id=$infos->id&action=delete' class="btn btn-danger">Supprimer</a>
+        </div>
+        </div>
+    </div>
+    </div>
 HTML;
 }
 
@@ -36,7 +56,7 @@ function value_input($infos,$name,$error) {
 function verif_inscription($infos) {
     /* VERIF FORMAT ET INSERTION DANS TABLEAU PARAMETRES */
     $error = null;
-
+    
     /* VERIF MEMBRE */
     if (isset($infos["pseudo"])) {
         $pseudo = trim(htmlspecialchars($infos["pseudo"]));
@@ -97,6 +117,9 @@ function verif_inscription($infos) {
 
     /* VERIF TABLEAU PARAMETRES ET DISPONIBILITE PSEUDO/MAIL */
     try {
+        if (empty($_POST["prenom"]) || empty($_POST["nom"]) || empty($_POST["mail"]) || empty($_POST["pseudo"]) || empty($_POST["statut"]) || empty($_POST["civilite"])) {
+            throw new Exception("Tous les champs doivent être remplis");
+        }
         if (!empty($error)) {
             throw new Exception("Certains champs ne sont pas valides");
         }
@@ -287,6 +310,7 @@ function verif_vehicule($infos,$file = null) {
     
     if (!empty($file['fichier'])) {
         try {
+            
             // Verifie qu'il n'y a pas d'erreur
             if ($file['fichier']['error'] != 0) {
                 throw new Exception("Erreur lors de l'accès au fichier");
@@ -322,6 +346,11 @@ function verif_vehicule($infos,$file = null) {
 
     /* VERIF ERREURS ET DOUBLONS */
     try {
+        // Verifie que tous les champs sont remplis
+        if (empty($_POST["titre"]) || empty($_POST["marque"]) || empty($_POST["modele"]) || empty($_POST["description"]) || empty($_POST["prix"]) || empty($_POST["agence_id"]) || empty($_FILES["fichier"])) {
+            throw new Exception("Tous les champs doivent être remplis");
+        }
+        // Verifie que tous les champs sont valides
         if (!empty($error)) {
             throw new Exception("Des champs ne sont pas valides");
         }

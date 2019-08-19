@@ -11,7 +11,6 @@
 
   <title>SIRA - LOCATION DE VEHICULES DE PRESTIGES</title>
 
-  <!-- Bootstrap core CSS -->
   <!-- Font Awesome -->
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
 <!-- Bootstrap core CSS -->
@@ -32,14 +31,21 @@
 
 </head>
 
-<body id="page-top">
+<body id="">
 
   <!-- Navigation -->
-  <nav class="navbar navbar-expand navbar-dark default-color mb-4">
-      <div class="container">
+  <nav class="navbar navbar-expand-md default-color navbar-dark mb-4">
+    <div class="container">
       <a class="navbar-brand" href="<?= RACINE ?>">SIRA</a>
+
+      <!-- Collapse button -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"><span class="navbar-toggler-icon"></span></button>
+
+      <!-- Collapsible content -->
+      <div class="collapse navbar-collapse" id="navbar">
         <ul class="navbar-nav ml-auto">
-    <?php if (is_connected()): ?>
+
+  <?php if (is_connected()): ?>
     
         <?php if ($_SESSION["statut"] == "Admin"): ?>
           <li class="nav-item">
@@ -69,15 +75,14 @@
                 aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-user"></i>
             </a>
-              <div class="dropdown-menu dropdown-menu-right dropdown-default"
-                aria-labelledby="navbarDropdownMenuLink-333">
+              <div class="dropdown-menu dropdown-menu-right dropdown-default">
                 <a class="dropdown-item" href="#">Mon compte</a>              
                 <a class="dropdown-item" href="<?= RACINE ."deconnexion.php"?>">Se déconnecter</a>
               </div>
             </li>
-          </ul>      </div>
-    </nav>
-<?php else: ?>
+          </ul>
+
+  <?php else: ?>
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
           <a class="nav-link" href="<?= RACINE."connexion.php"?>">Se connecter</a>
@@ -92,7 +97,10 @@
         </a>
       </li>
       </ul>
-    </div>
-  </nav>
-<?php endif ?>
+    
+  <?php endif ?>
+  </div>
+  </div>
+
+</nav>
 <!-- MODAL -->

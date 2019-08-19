@@ -15,9 +15,6 @@ try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);
         unset($_GET['success']);
-        if (empty($_POST["prenom"]) || empty($_POST["nom"]) || empty($_POST["mail"]) || empty($_POST["pseudo"]) || empty($_POST["statut"]) || empty($_POST["civilite"])) {
-            throw new Exception("Tous les champs doivent être remplis");
-        }
         /* INSERTION */
         if (empty($_POST["id"])) {
             
@@ -39,6 +36,7 @@ try {
                 $success = "Membre modifié avec succès";
             }
         }
+        
     }
         
 } catch (Exception $e) {
