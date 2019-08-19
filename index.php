@@ -1,15 +1,19 @@
 <?php
 require_once "req/modele.php";
 require 'req/header.php';
+    $donnees = execRequete("SELECT vehicules.id FROM vehicules INNER JOIN reservations ON vehicules.id = reservations.id");
+    $vehicules_reserves = $donnees->fetchAll();
+    var_dump($vehicules_reserves);
     if (isset($_GET["tri"])) {
         $choix_tri = $_GET["tri"] == "croissant" ? "ORDER BY PRIX ASC" : "ORDER BY PRIX DESC";
         $donnees = execRequete("SELECT vehicules.id, vehicules.titre, vehicules.prix, vehicules.description, vehicules.photos, agences.titre AS titre_agence
-            FROM vehicules
-            INNER JOIN agences ON agences.id = vehicules.agence_id $choix_tri",[]);
+        FROM agences INNER JOIN vehicules ON agences.id = vehicules.agence_id
+        WHERE vehicules.id != (SELECT id_vehicule FROM reservations) $choix_tri",[]);
     } else {
         $donnees = execRequete("SELECT vehicules.id, vehicules.titre, vehicules.prix, vehicules.description, vehicules.photos, agences.titre AS titre_agence
-            FROM vehicules
-            INNER JOIN agences ON agences.id = vehicules.agence_id",[]);
+        FROM agences INNER JOIN vehicules ON agences.id = vehicules.agence_id
+        WHERE vehicules.id != (SELECT id_vehicule FROM reservations)",[]);
+        
     }
     $vehicules = $donnees->fetchAll();
 
