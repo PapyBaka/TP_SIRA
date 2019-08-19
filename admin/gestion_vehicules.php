@@ -128,9 +128,9 @@ try {
 
     <?php if (!empty($_POST["id"]) || !empty($_GET["id"])): ?>
         <?php if (isset($info_vehicule)): ?>
-        <input type="text" value="<?= $_GET["id"] ?>" name="id">
+        <input type="hidden" value="<?= $_GET["id"] ?>" name="id">
         <?php elseif (isset($verif_vehicule["error"])): ?>
-        <input type="text" value="<?= $_POST["id"] ?>" name="id">
+        <input type="hidden" value="<?= $_POST["id"] ?>" name="id">
         <?php endif ?>
     <?php endif ?>
     <div class="form-group">

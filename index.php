@@ -16,21 +16,22 @@ require 'req/header.php';
 ?>
 <div class="container">
 
-    <div class="row border d-flex align-items-center justify-content-center">
+    <div class="navbar navbar-expand-lg navbar-dark light-color">
         <!-- Tri croissant/decroissant -->
-        <div class="col-4 text-center">
-            <button class="btn btn-primary text-center dropdown-toggle mr-4" type="button" data-toggle="dropdown">Trier par</button>
+        <div class="col">
+            <a class="text-center dropdown-toggle mr-4" data-toggle="dropdown">Trier par : <?= isset($_GET['tri']) ? "prix ".$_GET['tri'] : "" ?></a>
+            
             <div class="dropdown-menu">
-            <a class="dropdown-item" href="index.php?tri=croissant">Prix croissant</a>
-            <a class="dropdown-item" href="index.php?tri=decroissant">Prix décroissant</a>
+            <a class="dropdown-item" href="?tri=croissant">Prix croissant</a>
+            <a class="dropdown-item" href="?tri=décroissant">Prix décroissant</a>
             </div>
         </div>
         
         <!-- Tri croissant/decroissant -->
 
         <!-- Filtre choix dates -->
-        <div class="col-4">
-        <form action="" method="post" class="d-flex justify-content-around">
+        
+        <form action="" method="post" class="d-flex justify-content-center">
             <div class="md-form">
             <input class="mt-4"type="date" id="datedebut" class="form-control">
             <label class="mt-4" for="datedebut">Date de début</label>
@@ -39,11 +40,9 @@ require 'req/header.php';
             <input class="mt-4" type="date" id="datefin" class="form-control">
             <label class="mt-4" for="datefin">Date de fin</label>
             </div>
-            <div class="w-100"></div>
-            <button class="btn btn-primary" type="submit">Filtrer</button>
         </form>
-        </div>
-        
+        <button class="btn btn-outline-primary" type="submit">Filtrer</button>
+
         <!-- Filtre choix dates -->
     </div>
     
@@ -76,6 +75,7 @@ require 'req/header.php';
         </div>
     </div>
     <?php endforeach ?>
+
 
 </div>
 
