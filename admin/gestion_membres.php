@@ -57,9 +57,9 @@ try {
         
     }
 /* RECUPERATION DES INFOS DE LA TABLE MEMBRES */
-    $donnees = execRequete("SELECT id,pseudo,nom,prenom,email,civilite,statut, DATE_FORMAT(date_enregistrement, '%d/%m/%Y - %Hh%i') AS date_enregistrement FROM membres WHERE id <> ?", [$_SESSION['id']]);
+    $donnees = execRequete("SELECT id,pseudo,nom,prenom,email,civilite,statut, DATE_FORMAT(date_enregistrement, '%d/%m/%Y - %Hh%i') AS date_enregistrement FROM membres");
     $membres = $donnees->fetchAll();
-    $donnees = execRequete("SELECT DISTINCT(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'membres' AND COLUMN_NAME NOT IN ('mot_de_passe','type')");
+    $donnees = execRequete("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'membres' AND COLUMN_NAME NOT IN ('mot_de_passe')");
     $colonnes = $donnees->fetchAll();
 } catch (Exception $e) {
     $error = $e->getMessage();

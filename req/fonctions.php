@@ -43,16 +43,6 @@ return <<<HTML
 HTML;
 }
 
-function value_input($infos,$name,$error) {
-    if(isset($infos)) {
-        echo $infos->$name;
-    } elseif (isset($error)) {
-        echo $_POST["$name"];
-    } else {
-        echo "";
-    }
-}
-
 function verif_inscription($infos) {
     /* VERIF FORMAT ET INSERTION DANS TABLEAU PARAMETRES */
     $error = null;
