@@ -82,7 +82,7 @@ try {
         <thead class="thead-dark">
             <tr>
             <?php foreach ($colonnes as $colonne): ?>
-                <th><?= $colonne->COLUMN_NAME ?></th>
+                <th style="<?= $colonne->COLUMN_NAME == 'description' ? 'width:30%;' : '' ?>"><?= $colonne->COLUMN_NAME ?></th>
                 <?php endforeach ?>
                 <th>Action</th>
             </tr>

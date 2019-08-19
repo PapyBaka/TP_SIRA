@@ -13,9 +13,6 @@ try {
     if (isset($_POST["enregistrer"])) {
         unset($_POST['enregistrer']);
         unset($_GET["success"]);
-        if (empty($_POST["titre"]) || empty($_POST["adresse"]) || empty($_POST["ville"]) || empty($_POST["cp"]) || empty($_POST["description"]) || empty($_FILES["fichier"])) {
-            throw new Exception("Tous les champs doivent être remplis");
-        }
         /* INSERTION */
         if (empty($_POST["id"])) {
             echo "PAS D'ID";
@@ -79,13 +76,13 @@ try {
 
 ?>
   
-<div class="container">
-        
-    <table class="table text-center table-bordered ">
+<div class="container-fluid">
+<table class="table text-center table-bordered col-10 mx-auto">
         <thead class="thead-dark">
             <tr>
             <?php foreach ($colonnes as $colonne): ?>
-                <th><?= $colonne->COLUMN_NAME ?></th>
+                
+                <th style="<?= $colonne->COLUMN_NAME == 'description' ? 'width:30%;' : '' ?>"><?= $colonne->COLUMN_NAME ?></th>
                 <?php endforeach ?>
                 <th>Action</th>
             </tr>
@@ -95,7 +92,7 @@ try {
             <tr>
                 <?php foreach ($agence as $k => $info): ?>
                 <?php if ($k == "photos"): ?>
-                <td class="align-middle"><img class="img-fluid p-0" width="150" height="150" src="<?= $info ?>"></td>
+                <td class="align-middle"><img class="img-fluid p-0" height="150" width="150" style="object-fit:cover;"  src="<?= $info ?>"></td>
                 <?php else: ?>
                 <td class="align-middle"><?= $info ?></td>
                 <?php endif ?>
@@ -105,6 +102,10 @@ try {
             <?php endforeach ?>
         </tbody>
     </table>
+</div>
+
+
+<div class="container">
 
     <?php if (isset($error) || isset($verif_agence["error"]["fichier"]) || isset($verif_agence["error"]["global"])): ?>
         <div class="alert alert-danger">

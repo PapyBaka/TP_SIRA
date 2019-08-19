@@ -227,6 +227,9 @@ function verif_agence($infos,$file = null) {
 
     /* VERIF ERREURS ET DOUBLONS */
     try {
+        if (empty($_POST["titre"]) || empty($_POST["adresse"]) || empty($_POST["ville"]) || empty($_POST["cp"]) || empty($_POST["description"]) || empty($_FILES["fichier"])) {
+            throw new Exception("Tous les champs doivent être remplis");
+        }
         if (!empty($error)) {
             throw new Exception("Des champs ne sont pas valides");
         }
