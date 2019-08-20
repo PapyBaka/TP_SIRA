@@ -15,10 +15,10 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
 
     if (isset($_GET["tri"])) {
 
-        $choix_tri = $_GET["tri"] == "croissant" ? "ORDER BY PRIX ASC" : "ORDER BY PRIX DESC";
+        $choix_tri = $_GET["tri"] == "croissant" ? "ORDER BY PRIX" : "ORDER BY PRIX DESC";
         $donnees = execRequete("SELECT vehicules.id, vehicules.titre, vehicules.marque, vehicules.modele, vehicules.prix, vehicules.description, vehicules.photos, agences.titre AS titre_agence
         FROM agences INNER JOIN vehicules ON agences.id = vehicules.agence_id
-        WHERE vehicules.id != (SELECT id_vehicule FROM reservations) $choix_tri",[]);
+        WHERE NOT EXISTS (SELECT id_vehicule FROM reservations WHERE id_vehicule = vehicules.id) $choix_tri",[]);
     } else {
         $donnees = execRequete("SELECT vehicules.id, vehicules.titre, vehicules.marque, vehicules.modele, vehicules.prix, vehicules.description, vehicules.photos, agences.titre AS titre_agence 
         FROM agences INNER JOIN vehicules ON agences.id = vehicules.agence_id 
