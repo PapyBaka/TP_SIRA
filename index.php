@@ -1,9 +1,6 @@
 <?php
 require_once "req/modele.php";
 require 'req/header.php';
-    /*$donnees = execRequete("SELECT vehicules.id FROM vehicules INNER JOIN reservations ON vehicules.id = reservations.id");
-    $vehicules_reserves = $donnees->fetchAll();
-    var_dump($vehicules_reserves); */
 
     if (isset($_GET["tri"])) {
         $choix_tri = $_GET["tri"] == "croissant" ? "ORDER BY PRIX ASC" : "ORDER BY PRIX DESC";
@@ -17,7 +14,6 @@ require 'req/header.php';
         
     }
     $vehicules = $donnees->fetchAll();
-    var_dump($vehicules);
 
 ?>
 <div class="container">
