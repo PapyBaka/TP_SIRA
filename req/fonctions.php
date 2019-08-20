@@ -353,3 +353,45 @@ function verif_vehicule($infos,$file = null) {
 
     return ["error" => $error, "parametres" => $parametres];
 }
+
+function verif_date($datedebut,$datefin): array {
+    $error = null;
+    try {
+        // Vérification du format
+        if (!verif_format($datedebut) && !verif_format($datefin)) {
+            throw new Exception("Date non valide enfoiré");
+        } 
+
+        // Vérification date debut < date fin
+        $interval = $datedebut->diff($datefin);
+        if ($interval->invert == 1) {
+            throw new Exception("La date de début ne doit pas être supérieure à la date de fin");
+        }
+
+        // Verification date actuelle <= date debut
+        $date_actuelle = new DateTime();
+        $interval_futur = $date_actuelle->diff($datedebut);
+        if ($interval_futur->invert == 1) {  
+            if ($interval_futur->h >= 24 || $interval_futur->d > 0) {
+            throw new Exception("La date indiquée doit être dans le futur comme Kaaris");
+            }
+        }
+
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+
+    return ["error" => $error, "nb_jours" => $interval->days];
+
+}
+
+function verif_format($date): bool {
+    $jour = $date->format("d");
+    $mois = $date->format("m");
+    $annee = $date->format("Y");
+    if (!checkdate($mois,$jour,$annee)) {
+        return false;
+    } else {
+        return true;
+    }
+}
