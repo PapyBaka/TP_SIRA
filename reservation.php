@@ -1,7 +1,7 @@
 <?php
 require_once "req/modele.php";
 require 'req/header.php';
-
+$tva = 0.2;
 if (!is_connected()) {
     header('Location:' . RACINE . 'connexion.php');
 }
@@ -20,72 +20,104 @@ $donnees = execRequete("SELECT agences.id, agences.titre, agences.description, a
 $agence = $donnees->fetch();
 ?>
 
+<?php if(isset($_GET['id']) && isset($_GET['datedebut']) && isset($_GET['datefin'])):?>
+
 <div class="container">
 
 <!-- DETAILS VEHICULE -->
   <div class="card m-4">
     <div class="view overlay rounded hoverable">
 
-    <h1 class="card-header">Détails véhicule</h1>
-            <div class="card-body blue-grey-text">
+    <h2 class="card-header blue-grey darken-3 text-white text-center">Détails réservation</h2>
+            <div class="card-body ">
 
               <!-- Details vehicule -->
 
+              <div class="row">
+                <div class="col">
+                <p class="text-center h2">Votre véhicule</p>
+                <hr class="my-2">
+                </div>
+                <div class="col">
+                <p class="text-center h2">Votre agence</p>
+                <hr class="my-2">
+                </div>
+              </div>
+              
 
-              <div class="row align-items-center m-4">
+              <div class="row align-items-center m-4 blue-grey-text">
+                  <div class="col-3">
 
-                <div class="col-6">
+                      <!--Title-->
 
+                      <p class="card-title h2"><?=$vehicule->titre?></p>
+                      <p class="h4"><?=$vehicule->marque?> - <?=$vehicule->modele?></p>
+                      <hr class="mt-4">
+                      <!--Text-->
+                      <p class="h6 brown-text"><?=$vehicule->description?></p>
+                      <hr class="my-3">
+
+                  </div>
+
+                  <div class="col-3">
+                    <img class="img-fluid rounded w-100 m-auto" src="<?=$vehicule->photos?>">
+                  </div>
+
+                  <div class="col-3">
                     <!--Title-->
-
-                    <h4 class="card-title h1"><?=$vehicule->titre?></h4>
-                    <h5><?=$vehicule->marque?> - <?=$vehicule->modele?></h5>
+                    <p class="card-title h2"><?=$agence->titre?></p>
                     <hr class="mt-4">
                     <!--Text-->
-                    <p class="h6 brown-text"><?=$vehicule->description?></p>
+                    <p class="brown-text"><?=$agence->description?><br>
+                    <?=$agence->adresse?><br>
+                    <?=$agence->cp?><br>
+                    <?=$agence->ville?></p>
                     <hr class="my-3">
+                  </div>
 
-                </div>
-
-                <div class="col-6">
-                <img class="img-fluid rounded w-50 m-auto" src="<?=$vehicule->photos?>">
-                </div>
+                  <div class="col-3">
+                    <img class="img-fluid rounded w-100 m-auto" src="<?=$agence->photos?>">
+                  </div>
+                  
 
               </div>
-</div>
 
-              <!-- Details agence -->
-              <h1 class="card-header">Détails agence</h1>
-              <div class="card-body">
-              <div class="row align-items-center m-4">
+                <div class="col-12">
+                  <table class="table">
 
-                <div class="col-6">
-                  <!--Title-->
-                  <h4 class="card-title h1"><?=$agence->titre?></h4>
-                  <hr class="mt-4">
-                  <!--Text-->
-                  <p class="h6 brown-text"><?=$agence->description?></p>
-                  <p class="h6 brown-text"><?=$agence->adresse?></p>
-                  <p class="h6 brown-text"><?=$agence->cp?></p>
-                  <p class="h6 brown-text"><?=$agence->ville?></p>
-                  <hr class="my-3">
+                      <thead class="thead-dark">
+                        <tr>
+                          <th scope="col">Date de début</th>
+                          <th scope="col">Date de fin</th>
+                          <th scope="col">Nb jours</th>
+                          <th scope="col">Prix H.T</th>
+                          <th scope="col">Total H.T</th>
+
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td><?= $_SESSION['datedebut'] ?></th>
+                          <td><?= $_SESSION['datefin'] ?></td>
+                          <td class="text-right"><?= $_SESSION['nbjours'] ?></td>
+                          <td class="text-right"><?=$vehicule->prix?>€</td>
+                          <td class="text-right"><?= $horsTaxe = $vehicule->prix*$_SESSION['nbjours']?>€</td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4" align="right"><strong>Montant T.V.A : (20%)</strong></td>
+                            <td class="text-right"><strong><?=$TTC= $horsTaxe*($tva)?> €</strong></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4" align="right"><strong>TOTAL TTC :</strong></td>
+                            <td class="text-right"><strong><?=$TTC + $horsTaxe?> €</strong></td>
+                        </tr>
+                      </tbody>
+                  </table>
                 </div>
-
-                <div class="col-6">
-                <img class="img-fluid rounded w-50 m-auto" src="<?=$agence->photos?>">
-                </div>
-
-                </div>
-              </div>
-
-
-            </div>
-
-
-
+            </div>  
     </div>
-
-  </div>
-  <h3 class="h2"><strong><?=$vehicule->prix?>€</strong><small class="text-muted text-small"> /jour</small></h3>
-
 </div>
+<?php endif?>

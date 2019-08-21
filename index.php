@@ -26,8 +26,10 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
         
     }
     $vehicules = $donnees->fetchAll();
+    
 
 ?>
+</div>
 <div class="container">
 
     <div class="navbar navbar-expand-lg navbar-dark light-color col-md-8 m-auto">
@@ -36,7 +38,7 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
         <div class="container d-flex justify-content-center">
         
                 <div class="d-flex flex-column">
-                <p class="m-0 text-center">Sélectionner les dates de réservations afin de réserver un véhicule</p>
+                <p class="m-0 text-center font-weight-bold blue-grey-text">Sélectionner les dates de réservations afin de réserver un véhicule</p>
                 
                 <form action="" method="get" class="d-flex justify-content-center">
                     <div class="md-form">
@@ -45,13 +47,13 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
                     </div>
                     <div class="md-form">
                     <input class="mt-2" type="date" id="datefin" class="form-control" name="datefin" value="<?= isset($_GET['datefin']) ? $_GET["datefin"] : ''?>">
-                    <label class="mt-3" for="datefin">Date de fin</label>
+                    <label class="mt-3" for="datefin"><strong>Date de fin</strong></label>
                     </div>
                     <button class="btn btn-outline-primary h-50 mt-3" type="submit">Valider</button>
                 </form>
 
                 <?php if (isset($error)): ?>
-                <p class="text-danger text-center">
+                <p class="text-danger text-center font-weight-bold">
                 <?= $error ?>
                 </p>
                 <?php endif ?>  
@@ -61,7 +63,7 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
     </div>   
 
     
-    <div class="col">
+    <div class="col mt-4">
             <a class="text-center dropdown-toggle mr-4" data-toggle="dropdown">Trier par : <?= isset($_GET['tri']) ? "prix ".$_GET['tri'] : "" ?></a>
             
             <div class="dropdown-menu">
@@ -97,7 +99,9 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
                             <p class="h6 brown-text"><?= $vehicule->description?></p>
                             <p class="h6 brown-text"><?= $vehicule->titre_agence?></p>
                             <hr class="my-3">
-                            <h3 class="h2"><strong><?= $vehicule->prix?>€</strong><small class="text-muted text-small"> /jour</small></h3>
+                            <h3 class="h2"><strong><?= $vehicule->prix?>€</strong><small class="text-muted text-small"> /jour seulement* !</small></h3>
+                            <p class="h5"><small class="text-muted text-small"> *voir condition général de vente</small></p>
+
                         </div>
                         <div class="col-6">
                         <img class="img-fluid rounded" src="<?= $vehicule->photos ?>">
@@ -115,7 +119,11 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
     </div>
     <?php endforeach ?>
 
+    
+<?php 
+$_SESSION['datedebut'] = $_GET['datedebut'];
+$_SESSION['datefin'] = $_GET['datefin'];
+$_SESSION['nbjours'] = $verif_date["nb_jours"];
 
-</div>
-
+?>
 <?php require "req/footer.php";
