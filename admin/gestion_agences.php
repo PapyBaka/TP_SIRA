@@ -15,7 +15,6 @@ try {
         unset($_GET["success"]);
         /* INSERTION */
         if (empty($_POST["id"])) {
-            echo "PAS D'ID";
             $verif_agence = verif_agence($_POST,$_FILES);
             if (empty($verif_agence["error"])) {
                 $requete = execRequete("INSERT INTO agences (titre,adresse,ville,cp,description,photos) VALUES (?,?,?,?,?,?)",$verif_agence["parametres"]);
@@ -23,10 +22,6 @@ try {
             }
         /* MODIFICATION */  
             } else {
-                echo "ID SET";
-                echo "<pre>";
-                var_dump($_FILES);
-                echo "</pre>";
                 
                 if (!empty($_FILES["fichier"]["name"])) {
                     // FICHIER CHOISI

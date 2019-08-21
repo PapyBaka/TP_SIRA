@@ -1,26 +1,47 @@
 <?php
 require_once "req/modele.php";
 require 'req/header.php';
+$success = null;
 $tva = 0.2;
+$datedebut = new DateTime($_SESSION["datedebut"]);
+$datefin = new DateTime($_SESSION["datefin"]);
+
+if (!isset($_SESSION["id_vehicule"])) {
+  $_SESSION["id_vehicule"] = $_GET["id"];
+}
 if (!is_connected()) {
     header('Location:' . RACINE . 'connexion.php');
 }
 
-if (empty($_GET["datedebut"]) || empty($_GET["datefin"]) || empty($_GET["id"]) || empty($_GET["nbjours"])) {
+if (empty($_SESSION["id_vehicule"])) {
     header('Location:' . RACINE . 'index.php');
 }
 
 $donnees = execRequete("SELECT id, titre, prix, description, photos, marque, modele
             FROM vehicules
-            WHERE vehicules.id = ?", [$_GET["id"]]);
+            WHERE vehicules.id = ?", [$_SESSION["id_vehicule"]]);
+
 $vehicule = $donnees->fetch();
+
+$horsTaxe = $vehicule->prix*$_SESSION['nbjours'];
+$TTC= $horsTaxe*($tva);
+$total = $TTC + $horsTaxe;
+
 $donnees = execRequete("SELECT agences.id, agences.titre, agences.description, agences.adresse, agences.cp, agences.ville, agences.photos
             FROM agences INNER JOIN vehicules ON agences.id = vehicules.agence_id
-            WHERE vehicules.id = ?", [$_GET["id"]]);
+            WHERE vehicules.id = ?", [$_SESSION["id_vehicule"]]);
 $agence = $donnees->fetch();
-?>
 
-<?php if(isset($_GET['id']) && isset($_GET['datedebut']) && isset($_GET['datefin'])):?>
+if (isset($_SESSION["id_vehicule"]) && isset($_SESSION["datedebut"]) && isset($_SESSION["datefin"]) && isset($_SESSION["nbjours"]) && isset($_GET["confirm"])) {
+  $parametres = [$_SESSION["datedebut"],$_SESSION["datefin"],$_SESSION["id_vehicule"],$agence->id,$_SESSION["id"],$total];
+  echo "<pre>";
+  var_dump($parametres);
+  echo "</pre>";
+  $exec = execRequete("INSERT INTO reservations VALUES (date_debut,date_fin,id_vehicule,id_agence,id_membre,prix_total)",$parametres);
+  $success = "Bravo ! Vous avez bien réservé ce véhicule pour la période du " . $_SESSION["datedebut"] . " au " . $_SESSION["datefin"];
+  header("refresh:3;url=index.php");
+}
+?>
 
 <div class="container">
 
@@ -100,7 +121,7 @@ $agence = $donnees->fetch();
                         <tr>
                           <td><?= $_SESSION['datedebut'] ?></th>
                           <td><?= $_SESSION['datefin'] ?></td>
-                          <td class="text-right"><?= $_SESSION['nbjours'] ?></td>
+                          <td class="text-center"><?= $_SESSION['nbjours'] ?></td>
                           <td class="text-right"><?=$vehicule->prix?>€</td>
                           <td class="text-right"><?= $horsTaxe = $vehicule->prix*$_SESSION['nbjours']?>€</td>
                         </tr>
@@ -119,5 +140,9 @@ $agence = $donnees->fetch();
                 </div>
             </div>  
     </div>
+    <div class="card-footer text-center">
+      <a class="btn btn-primary btn-lg px-4" href="reservation.php?confirm">Réserver</a>
+    </div>
 </div>
-<?php endif?>
+
+<?php require "req/footer.php";

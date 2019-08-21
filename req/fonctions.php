@@ -368,6 +368,10 @@ function verif_date($datedebut,$datefin): array {
             throw new Exception("La date de début ne doit pas être supérieure à la date de fin");
         }
 
+        if ($datedebut->format("d/m/y") == $datefin->format("d/m/y")) {
+            throw new Exception("La réservation doit être d'au moins un jour");
+        }
+
         // Verification date actuelle <= date debut
         $date_actuelle = new DateTime();
         $interval_futur = $date_actuelle->diff($datedebut);

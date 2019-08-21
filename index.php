@@ -2,6 +2,7 @@
 require_once "req/modele.php";
 require 'req/header.php';
 $error = null;
+unset($_SESSION["id_vehicule"]);
 if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
     if (empty($_GET["datedebut"]) || empty($_GET["datefin"])) {
         $error = "Vous devez sélectionner une date de début et de fin afin de pouvoir réserver un véhicule";
@@ -10,6 +11,9 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
         $datefin = new DateTime($_GET["datefin"]);
         $verif_date = verif_date($datedebut,$datefin);
         $error = $verif_date["error"];
+        $_SESSION['datedebut'] = $_GET["datedebut"];
+        $_SESSION['datefin'] = $_GET["datefin"];
+        $_SESSION['nbjours'] = $verif_date["nb_jours"];
     }
 }
 
@@ -29,7 +33,6 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
     
 
 ?>
-</div>
 <div class="container">
 
     <div class="navbar navbar-expand-lg navbar-dark light-color col-md-8 m-auto">
@@ -86,7 +89,7 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
     <div class="card m-4">
         <div class="view overlay zoom rounded hoverable">
             <?php if(!empty($_GET['datedebut']) && !empty($_GET['datefin']) && empty($error)):?>
-            <a href="reservation.php?id=<?= $vehicule->id ?>&nbjours=<?= $verif_date["nb_jours"] ?>&datedebut=<?= $_GET["datedebut"] ?>&datefin=<?= $_GET["datefin"] ?>">
+            <a href="reservation.php?id=<?= $vehicule->id ?>">
             <?php endif?>
                 <div class="card-body blue-grey-text">
                     <div class="row align-items-center">
@@ -121,9 +124,7 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
 
     
 <?php 
-$_SESSION['datedebut'] = $_GET['datedebut'];
-$_SESSION['datefin'] = $_GET['datefin'];
-$_SESSION['nbjours'] = $verif_date["nb_jours"];
+
 
 ?>
 <?php require "req/footer.php";
