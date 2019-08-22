@@ -37,13 +37,18 @@ if (isset($_SESSION["id_vehicule"]) && isset($_SESSION["datedebut"]) && isset($_
   echo "<pre>";
   var_dump($parametres);
   echo "</pre>";
-  $exec = execRequete("INSERT INTO reservations VALUES (date_debut,date_fin,id_vehicule,id_agence,id_membre,prix_total)",$parametres);
-  $success = "Bravo ! Vous avez bien réservé ce véhicule pour la période du " . $_SESSION["datedebut"] . " au " . $_SESSION["datefin"];
-  header("refresh:3;url=index.php");
+  $exec = execRequete("INSERT INTO reservations (date_debut,date_fin,id_vehicule,id_agence,id_membre,prix_total) VALUES (?,?,?,?,?,?)",$parametres);
+  $success = "Vous avez bien réservé ce véhicule pour la période du " . $datedebut->format("d/m/Y") . " au " . $datefin->format("d/m/Y") . "<br>Vous serez redirigé vers l'accueil dans 10 secondes. Si ce n'est pas le cas, <a href='index.php'>cliquez ici</a>";
+  header("refresh:10;url=index.php");
 }
 ?>
 
 <div class="container">
+  <?php if (isset($success)): ?>
+  <div class="alert alert-success text-center">
+    <?= $success ?>
+  </div>
+<?php endif; ?>
 
 <!-- DETAILS VEHICULE -->
   <div class="card m-4">
