@@ -3,10 +3,7 @@ require_once "req/modele.php";
 require 'req/header.php';
 $error = null;
 unset($_SESSION["id_vehicule"]);
-echo "<pre>";
 $reservations = execRequete("SELECT id_vehicule, date_debut, date_fin FROM reservations ORDER BY date_debut ASC")->fetchAll();
-var_dump($reservations);
-echo "</pre>";
 
 if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
     if (empty($_GET["datedebut"]) || empty($_GET["datefin"])) {
@@ -19,12 +16,6 @@ if (isset($_GET["datedebut"]) && isset($_GET["datefin"])) {
         $_SESSION['datedebut'] = $_GET["datedebut"];
         $_SESSION['datefin'] = $_GET["datefin"];
         $_SESSION['nbjours'] = $verif_date["nb_jours"];
-        
-        echo "<pre>";
-        var_dump($_GET["datedebut"]);
-        var_dump($_GET["datefin"]);
-        
-        echo "</pre>";
     }
 }
 
